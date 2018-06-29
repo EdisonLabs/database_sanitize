@@ -1,0 +1,40 @@
+# @file
+# .travis.yml - Databse Sanitize Travis CI Integration
+
+language: php
+
+php:
+  - 7.1
+
+matrix:
+  fast_finish: true
+
+dist: trusty
+
+# Skip tests for tags.
+if: tag IS blank
+
+env:
+  global:
+    # Set the composer vendor Path.
+    - COMPOSER_VENDOR_PATH="$HOME/.composer/vendor"
+
+    # Add executables into PATH.
+    - PATH="$PATH:$COMPOSER_VENDOR_PATH/bin"
+
+    - UNISH_NO_TIMEOUTS=1
+
+before_install:
+  - composer self-update
+
+install:
+  - composer global require drupal/coder --prefer-dist -vvv || exit 1
+  - phpcs --config-set installed_paths "$COMPOSER_VENDOR_PATH/drupal/coder/coder_sniffer"
+
+before_script:
+  - composer install -vvv
+  - cd "$TRAVIS_BUILD_DIR/vendor/drush/drush"; composer install
+
+script:
+  - phpcs --standard=Drupal --ignore=vendor/* --warning-severity=0 .
+  - php "$TRAVIS_BUILD_DIR/vendor/drush/drush/vendor/bin/phpunit" --configuration "$TRAVIS_BUILD_DIR/vendor/drush/drush/tests" "$TRAVIS_BUILD_DIR/drush/tests"

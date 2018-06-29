@@ -1,0 +1,9 @@
+{
+    "name": "EdisonLabs/database_sanitize",
+    "description": "Provides drush commands for yaml sanitization files checks and generation.",
+    "license": "GPL-2.0+",
+    "type": "drupal-drush",
+    "require-dev": {
+        "drush/drush": "~8.1.17"
+    }
+}
