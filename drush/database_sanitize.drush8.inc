@@ -34,7 +34,7 @@ function database_sanitize_drush_command() {
   $items['db-sanitize-analyze'] = array(
     'description' => "Checks existing database.sanitize.yml files on the site installation against existing database tables.",
     'callback' => 'database_sanitize_analyze',
-    'aliases' => array('edsa'),
+    'aliases' => array('dbsa'),
     'options' => array(
       'merge-file' => array(
         'description' => 'The full path to the merged sanitize file.',
@@ -48,7 +48,7 @@ function database_sanitize_drush_command() {
   $items['db-sanitize-generate'] = array(
     'description' => "Generates a database.sanitize.yml file for tables not specified in the merged yaml file.",
     'callback' => 'database_sanitize_generate',
-    'aliases' => array('edsg'),
+    'aliases' => array('dbsg'),
     'options' => array(
       'merge-file' => array(
         'description' => 'The full path to the merged sanitize file.',

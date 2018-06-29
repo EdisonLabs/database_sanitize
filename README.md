@@ -6,8 +6,8 @@
 Provides a set of drush commands to assist in generating an `database.sanitize.yml` file including all tables in the database that are missing from the generated `database.sanitize.merge.yml` file.
 
 ### Commands included
-- `db-sanitize-analyze (edsa)` Provides a report on database tables not defined in the specified merged yml file.
-- `db-sanitize-generate (edsg)` generates an `database.sanitize.yml` file for all tables not specified in the merged yaml file.
+- `db-sanitize-analyze (dbsa)` Provides a report on database tables not defined in the specified merged yml file.
+- `db-sanitize-generate (dbsg)` generates an `database.sanitize.yml` file for all tables not specified in the merged yaml file.
 
 ## Usage instructions
 Both commands require the path to the merged sanitize file as the `--merge-file` option:
@@ -18,15 +18,15 @@ The generated queries for each missing table default to `TRUNCATE TABLE $table`.
 ### Examples:
 To find out how many tables are missing from the merge file:
 ```
-drush edsa --merge-file=/var/www/SITE/NON-PUBLIC-FOLDER/database.sanitize.merge.yml
+drush dbsa --merge-file=/var/www/SITE/NON-PUBLIC-FOLDER/database.sanitize.merge.yml
 ```
 To get the yml file content for the missing tables to be sanitized:
 ```
-drush edsg --merge-file=/var/www/SITE/NON-PUBLIC-FOLDER/database.sanitize.merge.yml --machine-name="my_module"
+drush dbsg --merge-file=/var/www/SITE/NON-PUBLIC-FOLDER/database.sanitize.merge.yml --machine-name="my_module"
 ```
 To save the missing tables yml file:
 ```
-drush edsg --merge-file=/var/www/pfenplatform/NON-PUBLIC-FOLDER/database.sanitize.merge.yml --machine-name="MY_profile" > app/profiles/MY_profile/database.sanitize.yml
+drush dbsg --merge-file=/var/www/pfenplatform/NON-PUBLIC-FOLDER/database.sanitize.merge.yml --machine-name="MY_profile" > app/profiles/MY_profile/database.sanitize.yml
 ```
 
 ## Format of the yml files
