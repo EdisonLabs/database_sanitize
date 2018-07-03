@@ -9,6 +9,7 @@ use Symfony\Component\DependencyInjection\ContainerInterface;
 
 /**
  * Class DatabaseSanitize.
+ *
  * @package Drupal\database_sanitize
  */
 class DatabaseSanitize {
@@ -17,7 +18,8 @@ class DatabaseSanitize {
 
   /**
    * Merge Yaml object.
-   * @var MergeYaml
+   *
+   * @var \EdisonLabs\MergeYaml\MergeYaml
    *   Object instance.
    */
   protected $mergeYaml;
@@ -32,7 +34,7 @@ class DatabaseSanitize {
   /**
    * DatabaseSanitize constructor.
    *
-   * @param LoggerChannelFactoryInterface $logger
+   * @param \Drupal\Core\Logger\LoggerChannelFactoryInterface $logger
    *   The LoggerChannelFactoryInterface object.
    *
    * @throws \Exception
@@ -76,7 +78,7 @@ class DatabaseSanitize {
   }
 
   /**
-   * Returns an array containing the Merge Yaml config from composer.json
+   * Returns an array containing the Merge Yaml config from composer.json.
    *
    * @return array
    *   The Merge Yaml config.
@@ -189,9 +191,9 @@ class DatabaseSanitize {
       return $db_tables;
     }
 
-    $yml_tables = array();
+    $yml_tables = [];
     foreach ($parsed_file['sanitize'] as $machine_name => $tables) {
-      foreach($tables as $table_name => $definition) {
+      foreach ($tables as $table_name => $definition) {
         if (!array_key_exists('description', $definition)) {
           $this->logger->warning('Table \'@table_name\' defined by \'@machine_name\' does not specify a \'description\' key.', ['@table_name' => $table_name, '@machine_name' => $machine_name]);
           continue;

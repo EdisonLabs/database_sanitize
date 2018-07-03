@@ -57,21 +57,21 @@ class DatabaseSanitizeCase extends CommandUnishTestCase {
     // Install the standard install profile.
     $sites = $this->setUpDrupal(1, TRUE, UNISH_DRUPAL_MAJOR_VERSION);
     $this->webRoot = $this->webroot();
-    $this->siteOptions = array(
+    $this->siteOptions = [
       'root' => $this->webRoot,
       'uri' => key($sites),
       'yes' => NULL,
-    );
+    ];
 
     // Symlink database_sanitize inside the site being tested, so that it is
     // available as a drush command.
     $target = dirname(__DIR__);
     $this->mkdir($this->webRoot . '/drush');
     \symlink($target, $this->webRoot . '/drush/database_sanitize');
-    $this->drush('cache-clear', array('drush'), $this->siteOptions);
+    $this->drush('cache-clear', ['drush'], $this->siteOptions);
 
     // Get tables defined in the database.
-    $this->drush('sqlq', array('show tables;'), $this->siteOptions);
+    $this->drush('sqlq', ['show tables;'], $this->siteOptions);
     $this->dbTables = $this->getOutputAsList();
 
     $this->fullySpecifiedYmlFile = $this->webRoot . '/database.sanitize.full.yml';
@@ -88,25 +88,25 @@ class DatabaseSanitizeCase extends CommandUnishTestCase {
     $this->assertContains('users', $this->dbTables);
 
     // Test db-sanitize-analyze command.
-    $analyze_options = $this->siteOptions + array(
+    $analyze_options = $this->siteOptions + [
       'merge-file' => $this->mergeYmlFile,
-    );
+    ];
     $dumped_tables_expected = count($this->dbTables) - 1;
-    $this->drush('db-sanitize-analyze', array(), $analyze_options);
+    $this->drush('db-sanitize-analyze', [], $analyze_options);
     $eds_analyze_output = $this->getErrorOutput();
     $this->assertContains(sprintf('There are %s tables not defined to be sanitized.', $dumped_tables_expected), $eds_analyze_output);
 
     $this->assertFileExists($this->fullySpecifiedYmlFile);
     $analyze_options['merge-file'] = $this->fullySpecifiedYmlFile;
-    $this->drush('db-sanitize-analyze', array(), $analyze_options);
+    $this->drush('db-sanitize-analyze', [], $analyze_options);
     $this->assertContains('All database tables are already specified', $this->getErrorOutput());
 
     // Test db-sanitize-generate command.
-    $generate_options = $this->siteOptions + array(
+    $generate_options = $this->siteOptions + [
       'machine-name' => 'database_sanitize_test',
       'merge-file' => $this->mergeYmlFile,
-    );
-    $this->drush('db-sanitize-generate', array(), $generate_options);
+    ];
+    $this->drush('db-sanitize-generate', [], $generate_options);
     $yaml = $this->getOutput();
     try {
       $parsed_yaml = Yaml::parse($yaml);
@@ -120,7 +120,7 @@ class DatabaseSanitizeCase extends CommandUnishTestCase {
     $this->assertArrayNotHasKey('users', $parsed_yaml['sanitize']['database_sanitize_test']);
 
     $generate_options['merge-file'] = $this->fullySpecifiedYmlFile;
-    $this->drush('db-sanitize-generate', array(), $generate_options);
+    $this->drush('db-sanitize-generate', [], $generate_options);
     $this->assertContains('All database tables are already specified', $this->getErrorOutput());
   }
 
@@ -128,14 +128,14 @@ class DatabaseSanitizeCase extends CommandUnishTestCase {
    * Generates a yml file specifying all tables in the database.
    */
   public function generateFullySpecifiedYmlFile() {
-    $content = array(
-      'sanitize' => array(),
-    );
+    $content = [
+      'sanitize' => [],
+    ];
     foreach ($this->dbTables as $table) {
-      $content['sanitize']['database_generate_test'][$table] = array(
+      $content['sanitize']['database_generate_test'][$table] = [
         'description' => '',
         'query' => "TRUNCATE TABLE {$table}",
-      );
+      ];
     }
 
     $export = Yaml::dump($content, PHP_INT_MAX, 2);

@@ -3,6 +3,7 @@
     "description": "Provides drush commands for yaml sanitization files checks and generation.",
     "license": "GPL-2.0+",
     "type": "drupal-module",
+    "minimum-stability": "dev",
     "require": {
         "edisonlabs/merge-yaml": "~1"
     },
