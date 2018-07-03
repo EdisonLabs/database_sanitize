@@ -1,0 +1,105 @@
+<?php
+
+/**
+ * @file
+ * Install, update and uninstall functions for the database_sanitize module.
+ */
+
+use Drupal\Component\Serialization\Json;
+use Drupal\Core\Serialization\Yaml;
+
+/**
+ * Implements hook_requirements().
+ */
+function database_sanitize_requirements($phase) {
+  $requirements = [];
+
+  if ($phase == 'runtime') {
+    $requirements['database_sanitize'] = [
+      'title' => t('Database Sanitize'),
+    ];
+    // @TODO we are assuming here the location of composer.json.
+    $composer_file = DRUPAL_ROOT . '/../composer.json';
+    if (!file_exists($composer_file)) {
+      $requirements['database_sanitize'] = [
+        'value' => "{$composer_file} file not found",
+        'severity' => REQUIREMENT_ERROR,
+      ];
+      return $requirements;
+    }
+    $composer_file_content = file_get_contents($composer_file);
+    $composer_data = Json::decode($composer_file_content);
+    if (!isset($composer_data['extra']) || empty($composer_data['extra'])) {
+      $requirements['database_sanitize'] = [
+        'value' => "Composer extra settings not found on {$composer_file}",
+        'severity' => REQUIREMENT_ERROR,
+      ];
+      return $requirements;
+    }
+    $extra = $composer_data['extra'];
+    if (!isset($extra['merge-yaml'])) {
+      $requirements['database_sanitize']['value'] = 'merge-yaml composer configuration not found.';
+      $requirements['database_sanitize']['severity'] = REQUIREMENT_ERROR;
+      return $requirements;
+    }
+    if (empty($extra['merge-yaml']['output-dir'])) {
+      $requirements['database_sanitize']['value'] = 'merge-yaml output-dir composer configuration not found.';
+      $requirements['database_sanitize']['severity'] = REQUIREMENT_ERROR;
+      return $requirements;
+    }
+
+    $merge_file = DRUPAL_ROOT . '/../' . $extra['merge-yaml']['output-dir'] . '/' . 'database.sanitize.merge.yml';
+    if (!file_exists($merge_file)) {
+      $requirements['database_sanitize']['value'] = "Unable to open file {$merge_file}";
+      $requirements['database_sanitize']['severity'] = REQUIREMENT_ERROR;
+      return $requirements;
+    }
+    // @TODO refactor _database_sanitize_get_unspecified_tables().
+    $merge_file_content = file_get_contents($merge_file);
+    try {
+      $parsed_file = Yaml::decode($merge_file_content);
+    }
+    catch (Exception $exception) {
+      $requirements['database_sanitize']['value'] = "Unable to parse the file {$merge_file} as YAML.";
+      $requirements['database_sanitize']['severity'] = REQUIREMENT_ERROR;
+      return $requirements;
+    }
+    // Find tables existing on the database that are not defined in the sanitize
+    // yaml file.
+    if (!array_key_exists('sanitize', $parsed_file)) {
+      $requirements['database_sanitize']['value'] = "The file {$merge_file} does not define a 'sanitize' key.";
+      $requirements['database_sanitize']['severity'] = REQUIREMENT_ERROR;
+      return $requirements;
+    }
+    if (empty($parsed_file['sanitize'])) {
+      $requirements['database_sanitize']['value'] = "No tables are defined to be sanitized in the file {$merge_file}.";
+      $requirements['database_sanitize']['severity'] = REQUIREMENT_ERROR;
+      return $requirements;
+    }
+    $db_tables = \Drupal::database()->query('show tables')->fetchCol();
+    $yml_tables = [];
+    foreach ($parsed_file['sanitize'] as $machine_name => $tables) {
+      foreach ($tables as $table_name => $definition) {
+        if (!array_key_exists('query', $definition)) {
+          $requirements['database_sanitize']['value'] = "The table {$table_name} does not specify a 'query' key.";
+          $requirements['database_sanitize']['severity'] = REQUIREMENT_WARNING;
+          return $requirements;
+        }
+        array_push($yml_tables, $table_name);
+      }
+    }
+    $missing = array_diff($db_tables, $yml_tables);
+    if (is_array($missing) && empty($missing)) {
+      $requirements['database_sanitize']['value'] = "All database tables are already specified in {$merge_file}..";
+      $requirements['database_sanitize']['severity'] = REQUIREMENT_OK;
+      return $requirements;
+    }
+    sort($missing);
+
+    $requirements['database_sanitize']['value'] = count($missing) . ' tables not defined to be sanitized.';;
+    $requirements['database_sanitize']['description'] = implode(', ', $missing);
+    $requirements['database_sanitize']['severity'] = REQUIREMENT_ERROR;
+  }
+
+  return $requirements;
+}
