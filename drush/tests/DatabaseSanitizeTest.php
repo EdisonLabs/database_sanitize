@@ -70,6 +70,8 @@ class DatabaseSanitizeCase extends CommandUnishTestCase {
     \symlink($target, $this->webRoot . '/drush/database_sanitize');
     $this->drush('cache-clear', ['drush'], $this->siteOptions);
 
+    $this->drush('pm-enable', array('database_sanitize'), $this->siteOptions);
+
     // Get tables defined in the database.
     $this->drush('sqlq', ['show tables;'], $this->siteOptions);
     $this->dbTables = $this->getOutputAsList();
