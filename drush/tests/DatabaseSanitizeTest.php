@@ -63,11 +63,9 @@ class DatabaseSanitizeCase extends CommandUnishTestCase {
       'yes' => NULL,
     ];
 
-    // Symlink database_sanitize inside the site being tested, so that it is
-    // available as a drush command.
+    // Symlink this module into the site being tested so it can be enabled.
     $target = dirname(__DIR__);
-    $this->mkdir($this->webRoot . '/drush');
-    \symlink($target, $this->webRoot . '/drush/database_sanitize');
+    \symlink($target, $this->webRoot . '/modules/database_sanitize');
     $this->drush('cache-clear', ['drush'], $this->siteOptions);
 
     $this->drush('pm-enable', array('database_sanitize'), $this->siteOptions);
