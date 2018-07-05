@@ -6,6 +6,8 @@ use Drupal\Component\Serialization\Json;
 use Drupal\Core\Logger\LoggerChannelFactoryInterface;
 use EdisonLabs\MergeYaml\MergeYaml;
 use Symfony\Component\DependencyInjection\ContainerInterface;
+use Symfony\Component\Yaml\Exception\ParseException;
+use Symfony\Component\Yaml\Yaml;
 
 /**
  * Class DatabaseSanitize.
@@ -14,7 +16,7 @@ use Symfony\Component\DependencyInjection\ContainerInterface;
  */
 class DatabaseSanitize {
 
-  const DATABASE_SANITIZE_FILE_NAME = "database.sanitize.yml";
+  const DATABASE_SANITIZE_FILE_NAME = "database.sanitize";
 
   /**
    * Merge Yaml object.
@@ -42,30 +44,10 @@ class DatabaseSanitize {
   public function __construct(LoggerChannelFactoryInterface $logger) {
     $this->logger = $logger->get('database_sanitize');
 
-    $merge_yaml_config = $this->getMergeYamlConfig();
+    $locations = $this->getSourceLocations();
+    $output_dir = $this->getOutputDir();
 
-    if (empty($merge_yaml_config)) {
-      $this->logger->error("Merge Yaml library seems to not be configured correctly.");
-    }
-
-    $database_sanitize_file = self::DATABASE_SANITIZE_FILE_NAME;
-
-    // Converts paths to be absolute.
-    // @TODO we are assuming here the location of composer.json.
-    $composer_file = DRUPAL_ROOT . '/../composer.json';
-    $composer_root = dirname($composer_file);
-
-    $locations = $merge_yaml_config['locations'];
-    foreach ($locations as &$location) {
-      if (!file_exists($location)) {
-        $location = realpath("$composer_root/$location");
-      }
-    }
-    unset($location);
-
-    $output_dir = $merge_yaml_config['output-dir'];
-
-    $this->mergeYaml = new MergeYaml([$database_sanitize_file], $locations, $output_dir);
+    $this->mergeYaml = new MergeYaml([self::DATABASE_SANITIZE_FILE_NAME], $locations, $output_dir);
   }
 
   /**
@@ -78,47 +60,87 @@ class DatabaseSanitize {
   }
 
   /**
+   * Returns the output directory to MergeYaml export the YML merge files.
+   *
+   * @return string
+   *   The output directory path.
+   */
+  public function getOutputDir() {
+    $merge_yaml_config = $this->getMergeYamlConfig();
+
+    if (empty($merge_yaml_config['output-dir'])) {
+      return '/tmp';
+    }
+
+    return $merge_yaml_config['output-dir'];
+  }
+
+  /**
+   * Gets the source directories to scan for sanitize YML files.
+   *
+   * @return array
+   *   An array containing the locations.
+   */
+  public function getSourceLocations() {
+    $merge_yaml_config = $this->getMergeYamlConfig();
+
+    $default_locations = [
+      DRUPAL_ROOT . '/modules',
+      DRUPAL_ROOT . '/profiles',
+    ];
+
+    $locations = $default_locations;
+    if (!empty($merge_yaml_config['locations'])) {
+      $locations = $merge_yaml_config['locations'];
+    }
+
+    // @TODO we are assuming here the location of composer.json.
+    $composer_file = DRUPAL_ROOT . '/../composer.json';
+    $composer_root = dirname($composer_file);
+
+    // Converts paths to be absolute.
+    foreach ($locations as &$location) {
+      if (!file_exists($location)) {
+        $location = realpath("$composer_root/$location");
+      }
+    }
+    unset($location);
+
+    return $locations;
+  }
+
+  /**
    * Returns an array containing the Merge Yaml config from composer.json.
    *
    * @return array
    *   The Merge Yaml config.
    */
   public function getMergeYamlConfig() {
+    $config = &drupal_static(__FUNCTION__);
+
+    if (isset($config)) {
+      return $config;
+    }
+
     // @TODO we are assuming here the location of composer.json.
     $composer_file = DRUPAL_ROOT . '/../composer.json';
     if (!file_exists($composer_file)) {
-      $this->logger->error("Unable to load composer.json file.");
       return [];
     }
 
     $composer_file_content = file_get_contents($composer_file);
     $composer_data = Json::decode($composer_file_content);
-    if (!isset($composer_data['extra']) || empty($composer_data['extra'])) {
-      $this->logger->error("Unable to load extra settings from composer.json.");
-      return [];
+
+    $config = [];
+    if (isset($composer_data['extra']['merge-yaml'])) {
+      $config = $composer_data['extra']['merge-yaml'];
     }
 
-    $extra = $composer_data['extra'];
-    if (!isset($extra['merge-yaml'])) {
-      $this->logger->error("Unable to load merge-yaml settings from composer.json.");
-      return [];
-    }
-
-    if (empty($extra['merge-yaml']['locations'])) {
-      $this->logger->error("Unable to load merge-yaml locations settings from composer.json.");
-      return [];
-    }
-
-    if (empty($extra['merge-yaml']['output-dir'])) {
-      $this->logger->error("Unable to load merge-yaml output-dir settings from composer.json.");
-      return [];
-    }
-
-    return $extra['merge-yaml'];
+    return $config;
   }
 
   /**
-   * Returns the content of the database.sanitize.yml file.
+   * Returns the content of the final database.sanitize.yml file.
    *
    * @return string
    *   The file content.
@@ -143,13 +165,13 @@ class DatabaseSanitize {
   }
 
   /**
-   * Gets the list of tables in the database not specified in $yml_file_path.
+   * Gets a list of tables in the database not specified in sanitize YML files.
    *
    * @param string $yml_file_path
-   *   The yml file path.
+   *   Optional parameter, the YML file path.
    *
-   * @return array|false
-   *   The list of tables not specified in the yml file or false if error.
+   * @return array
+   *   The list of tables not specified in sanitize YAML files.
    *
    * @throws \Exception
    */
@@ -176,15 +198,16 @@ class DatabaseSanitize {
       $parsed_file = Yaml::parse($file_content);
     }
     catch (ParseException $exception) {
-      $this->logger->error("Unable to parse the file @file as YAML", ["@file" => $yml_file_path]);
-      return FALSE;
+      $message = $exception->getMessage();
+      $this->logger->error("Unable to parse the sanitize YAML file. @message", ['@message' => $message]);
+
+      return $db_tables;
     }
 
-    // Find tables existing on the database that are not defined in the sanitize
-    // yaml file.
-    if (!array_key_exists('sanitize', $parsed_file)) {
-      $this->logger->error("The file @file does not define an 'sanitize' key", ["@file" => $yml_file_path]);
-      return FALSE;
+    if (is_null($parsed_file) || !array_key_exists('sanitize', $parsed_file)) {
+      $this->logger->error("The 'sanitize' key is not defined");
+
+      return $db_tables;
     }
 
     if (empty($parsed_file['sanitize'])) {
@@ -194,13 +217,17 @@ class DatabaseSanitize {
     $yml_tables = [];
     foreach ($parsed_file['sanitize'] as $machine_name => $tables) {
       foreach ($tables as $table_name => $definition) {
-        if (!array_key_exists('description', $definition)) {
-          $this->logger->warning('Table \'@table_name\' defined by \'@machine_name\' does not specify a \'description\' key.', ['@table_name' => $table_name, '@machine_name' => $machine_name]);
+        if (is_array($definition) && !array_key_exists('description', $definition)) {
+          $this->logger->warning('Table \'@table_name\' defined by \'@machine_name\' does not specify a \'description\' key', ['@table_name' => $table_name, '@machine_name' => $machine_name]);
           continue;
         }
 
-        if (!array_key_exists('query', $definition)) {
-          $this->logger->warning('Table \'@table_name\' defined by \'@machine_name\' does not specify a \'query\' key.', ['@table_name' => $table_name, '@machine_name' => $machine_name]);
+        if (is_array($definition) && !array_key_exists('query', $definition)) {
+          $this->logger->warning('Table \'@table_name\' defined by \'@machine_name\' does not specify a \'query\' key', ['@table_name' => $table_name, '@machine_name' => $machine_name]);
+          continue;
+        }
+
+        if (in_array($table_name, $yml_tables)) {
           continue;
         }
 
@@ -210,14 +237,9 @@ class DatabaseSanitize {
 
     $missing = array_diff($db_tables, $yml_tables);
     if (is_array($missing) && empty($missing)) {
-      $this->logger->info('All database tables are already specified in @file.', ['@file' => $yml_file_path]);
+      $this->logger->info('All database tables are already specified in sanitize YML files');
 
-      return FALSE;
-    }
-
-    $skipped = array_diff($yml_tables, $missing);
-    foreach ($skipped as $table_name) {
-      $this->logger->notice('Database table \'@table_name\' was already specified.', ['@table_name' => $table_name]);
+      return [];
     }
 
     sort($missing);

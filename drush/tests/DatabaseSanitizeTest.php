@@ -51,6 +51,19 @@ class DatabaseSanitizeCase extends CommandUnishTestCase {
   protected $mergeYmlFile;
 
   /**
+   * Work around to load EdisonLabs/MergeYaml library on test site.
+   *
+   * This function needs to be called after setUpDrupal().
+   */
+  public function setAutoloader() {
+    $autoloader_real_path = $this->webRoot . '/vendor/composer/autoload_real.php';
+    $autoloader_real_content = file_get_contents($autoloader_real_path);
+    $autoloader_psr4_content = str_replace('<?php', '', file_get_contents(__DIR__ . '/assets/psr4-autoloader.php'));
+    $autoloader_real_content .= $autoloader_psr4_content;
+    file_put_contents($autoloader_real_path, $autoloader_real_content);
+  }
+
+  /**
    * Setup the environment.
    */
   public function setUp() {
@@ -63,12 +76,15 @@ class DatabaseSanitizeCase extends CommandUnishTestCase {
       'yes' => NULL,
     ];
 
-    // Symlink this module into the site being tested so it can be enabled.
-    $target = dirname(__DIR__);
-    \symlink($target, $this->webRoot . '/modules/database_sanitize');
-    $this->drush('cache-clear', ['drush'], $this->siteOptions);
+    $this->setAutoloader();
 
-    $this->drush('pm-enable', array('database_sanitize'), $this->siteOptions);
+    // Symlink database_sanitize inside the site being tested, so that it is
+    // available as a drush command.
+    $target = dirname(__DIR__, 2);
+    \symlink($target, $this->webRoot . '/modules/database_sanitize');
+
+    $this->drush('cache-clear', ['drush'], $this->siteOptions);
+    $this->drush('pm-enable', ['database_sanitize'], $this->siteOptions);
 
     // Get tables defined in the database.
     $this->drush('sqlq', ['show tables;'], $this->siteOptions);
@@ -77,7 +93,7 @@ class DatabaseSanitizeCase extends CommandUnishTestCase {
     $this->fullySpecifiedYmlFile = $this->webRoot . '/database.sanitize.full.yml';
     $this->generateFullySpecifiedYmlFile();
 
-    $this->mergeYmlFile = $this->webRoot . '/drush/database_sanitize/tests/assets/database.sanitize.merge.yml';
+    $this->mergeYmlFile = $this->webRoot . '/modules/database_sanitize/drush/tests/assets/database.sanitize.merge.yml';
   }
 
   /**
@@ -89,22 +105,23 @@ class DatabaseSanitizeCase extends CommandUnishTestCase {
 
     // Test db-sanitize-analyze command.
     $analyze_options = $this->siteOptions + [
-      'merge-file' => $this->mergeYmlFile,
+      'file' => $this->mergeYmlFile,
     ];
+
     $dumped_tables_expected = count($this->dbTables) - 1;
     $this->drush('db-sanitize-analyze', [], $analyze_options);
     $eds_analyze_output = $this->getErrorOutput();
-    $this->assertContains(sprintf('There are %s tables not defined to be sanitized.', $dumped_tables_expected), $eds_analyze_output);
+    $this->assertContains(sprintf('There are %s tables not defined on sanitize YML files', $dumped_tables_expected), $eds_analyze_output);
 
     $this->assertFileExists($this->fullySpecifiedYmlFile);
-    $analyze_options['merge-file'] = $this->fullySpecifiedYmlFile;
+    $analyze_options['file'] = $this->fullySpecifiedYmlFile;
     $this->drush('db-sanitize-analyze', [], $analyze_options);
     $this->assertContains('All database tables are already specified', $this->getErrorOutput());
 
     // Test db-sanitize-generate command.
     $generate_options = $this->siteOptions + [
       'machine-name' => 'database_sanitize_test',
-      'merge-file' => $this->mergeYmlFile,
+      'file' => $this->mergeYmlFile,
     ];
     $this->drush('db-sanitize-generate', [], $generate_options);
     $yaml = $this->getOutput();
@@ -119,7 +136,7 @@ class DatabaseSanitizeCase extends CommandUnishTestCase {
     // @see assets/database.sanitize.merge.yml
     $this->assertArrayNotHasKey('users', $parsed_yaml['sanitize']['database_sanitize_test']);
 
-    $generate_options['merge-file'] = $this->fullySpecifiedYmlFile;
+    $generate_options['file'] = $this->fullySpecifiedYmlFile;
     $this->drush('db-sanitize-generate', [], $generate_options);
     $this->assertContains('All database tables are already specified', $this->getErrorOutput());
   }
