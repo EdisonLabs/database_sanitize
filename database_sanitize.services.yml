@@ -1,0 +1,5 @@
+services:
+  database_sanitize:
+    class: Drupal\database_sanitize\DatabaseSanitize
+    public: true
+    arguments: ['@logger.factory']

@@ -5,8 +5,7 @@
  * Drush Database Sanitize commands.
  */
 
-use Symfony\Component\Yaml\Yaml;
-use Symfony\Component\Yaml\Exception\ParseException;
+use Drupal\database_sanitize\DatabaseSanitize;
 
 /**
  * Implements hook_drush_help().
@@ -14,16 +13,16 @@ use Symfony\Component\Yaml\Exception\ParseException;
 function database_sanitize_drush_help($section) {
   switch ($section) {
     case 'meta:database_sanitize:title':
-      return dt('Database Sanitize commands');
+      return dt('Database Sanitize commands.');
 
     case 'meta:database_sanitize:summary':
-      return dt('Helper commands for dealing with database sanitization yaml files.');
+      return dt('Helper commands for dealing with database sanitization YAML files.');
 
     case 'drush:db-sanitize-analyze':
-      return dt('Provides a report on database tables not defined in the specified merged yml file.');
+      return dt('Compares existing @file.yml files on the site installation against existing database tables.', ['@file' => DatabaseSanitize::DATABASE_SANITIZE_FILE_NAME]);
 
     case 'drush:db-sanitize-generate':
-      return dt('Generates a database.sanitize.yml file for tables not defined in the specified merged yaml file.');
+      return dt('Generates a @file.yml file for tables not specified on sanitize YML files.', ['@file' => DatabaseSanitize::DATABASE_SANITIZE_FILE_NAME]);
   }
 }
 
@@ -31,162 +30,100 @@ function database_sanitize_drush_help($section) {
  * Implements hook_drush_command().
  */
 function database_sanitize_drush_command() {
-  $items['db-sanitize-analyze'] = array(
-    'description' => "Checks existing database.sanitize.yml files on the site installation against existing database tables.",
+  $items['db-sanitize-analyze'] = [
+    'description' => "Compares existing " . DatabaseSanitize::DATABASE_SANITIZE_FILE_NAME . ".yml files on the site installation against existing database tables.",
     'callback' => 'database_sanitize_analyze',
-    'aliases' => array('dbsa'),
-    'options' => array(
-      'merge-file' => array(
-        'description' => 'The full path to the merged sanitize file.',
-        'required' => TRUE,
-        'example-value' => 'NON-PUBLIC-FOLDER/database.sanitize.merge.yml',
-      ),
-    ),
+    'aliases' => ['dbsa'],
+    'options' => [
+      'file' => [
+        'description' => 'The full path to a sanitize YML file.',
+        'required' => FALSE,
+        'example-value' => 'NON-PUBLIC-FOLDER/' . DatabaseSanitize::DATABASE_SANITIZE_FILE_NAME . '.yml',
+      ],
+      'list' => [
+        'description' => 'List the table names.',
+        'required' => FALSE,
+      ],
+    ],
     'bootstrap' => DRUSH_BOOTSTRAP_DRUPAL_FULL,
-  );
+  ];
 
-  $items['db-sanitize-generate'] = array(
-    'description' => "Generates a database.sanitize.yml file for tables not specified in the merged yaml file.",
+  $items['db-sanitize-generate'] = [
+    'description' => "Generates a " . DatabaseSanitize::DATABASE_SANITIZE_FILE_NAME . ".yml file for tables not specified on sanitize YML files.",
     'callback' => 'database_sanitize_generate',
-    'aliases' => array('dbsg'),
-    'options' => array(
-      'merge-file' => array(
-        'description' => 'The full path to the merged sanitize file.',
-        'required' => TRUE,
-        'example-value' => 'NON-PUBLIC-FOLDER/database.sanitize.merge.yml',
-      ),
-      'machine-name' => array(
+    'aliases' => ['dbsg'],
+    'options' => [
+      'file' => [
+        'description' => 'The full path to a sanitize YML file.',
+        'required' => FALSE,
+        'example-value' => 'NON-PUBLIC-FOLDER/' . DatabaseSanitize::DATABASE_SANITIZE_FILE_NAME . '.yml',
+      ],
+      'machine-name' => [
         'description' => 'The machine name to export the tables under.',
         'required' => TRUE,
         'example-value' => 'MODULE_NAME',
-      ),
-    ),
-    'outputformat' => array(
+      ],
+    ],
+    'outputformat' => [
       'default' => 'yaml',
       'output-data-type' => 'format-yaml',
-    ),
+    ],
     'bootstrap' => DRUSH_BOOTSTRAP_DRUPAL_FULL,
-  );
+  ];
 
   return $items;
 }
 
 /**
  * Command callback for db-sanitize-analyze.
- *
- * @param string $yml_file_path
- *   The yml file path.
  */
 function database_sanitize_analyze() {
-  $yml_file_path = drush_get_option('merge-file');
-  $missing_tables = _database_sanitize_get_unspecified_tables($yml_file_path);
-  if ($missing_tables === FALSE) {
+  $yml_file_path = drush_get_option('file');
+  if ($yml_file_path && !file_exists($yml_file_path)) {
+    return drush_set_error(dt('File does not exist @file', ['@file' => $yml_file_path]));
+  }
+
+  $missing_tables = \Drupal::service('database_sanitize')->getUnspecifiedTables($yml_file_path);
+
+  if (!$missing_tables) {
+    drush_log(dt('All database tables are already specified in sanitize YML files'), 'ok');
     return;
   }
 
-  drush_log(dt('[Database Sanitize] There are @count tables not defined to be sanitized.', array('@count' => count($missing_tables))), 'warning');
+  drush_log(dt('There are @count tables not defined on sanitize YML files', ['@count' => count($missing_tables)]), 'warning');
+
+  if (drush_get_option('list')) {
+    drush_log(implode("\n", $missing_tables), 'warning');
+  }
 }
 
 /**
  * Command callback for db-sanitize-generate.
- *
- * @param string $yml_file_path
- *   The yml file path.
  */
 function database_sanitize_generate() {
   $machine_name = drush_get_option('machine-name');
   if (empty($machine_name)) {
-    return drush_set_error(dt('[Database Sanitize] You must specify a machine-name.'));
+    return drush_set_error(dt('You must specify a machine-name'));
   }
-  $yml_file_path = drush_get_option('merge-file');
-  $missing_tables = _database_sanitize_get_unspecified_tables($yml_file_path);
-  if ($missing_tables === FALSE) {
+
+  $yml_file_path = drush_get_option('file');
+  $missing_tables = \Drupal::service('database_sanitize')->getUnspecifiedTables($yml_file_path);
+  if (!$missing_tables) {
+    drush_log(dt('All database tables are already specified in sanitize YML files'), 'ok');
     return;
   }
 
-  $content = array(
-    'sanitize' => array(
-      $machine_name => array(),
-    ),
-  );
+  $content = [
+    'sanitize' => [
+      $machine_name => [],
+    ],
+  ];
   foreach ($missing_tables as $table) {
-    $content['sanitize'][$machine_name][$table] = array(
-      'description' => 'Generated by drush db-sanitize-generate',
+    $content['sanitize'][$machine_name][$table] = [
+      'description' => "Truncate {$table}. Generated by drush db-sanitize-generate.",
       'query' => "TRUNCATE TABLE {$table}",
-    );
+    ];
   }
 
   return $content;
-}
-
-/**
- * Gets the list of tables in the database not specified in $yml_file_path.
- *
- * @param string $yml_file_path
- *   The yml file path.
- *
- * @return array|false
- *   The list of tables not specified in the yml file or false if error.
- */
-function _database_sanitize_get_unspecified_tables($yml_file_path) {
-  // Get a list of all tables on the database.
-  $db_tables = \Drupal::database()->query('show tables')->fetchCol();
-  if (!file_exists($yml_file_path)) {
-    return drush_set_error(dt('[Database Sanitize] File does not exist @file', array('@file' => $yml_file_path)));
-  }
-  // Get and parse the database.sanitized.merged.yml file.
-  $file_content = file_get_contents($yml_file_path);
-  try {
-    $parsed_file = Yaml::parse($file_content);
-  }
-  catch (ParseException $exception) {
-    return drush_set_error(dt('[Database Sanitize] Unable to parse the file @file as YAML: @message', array(
-      '@file' => $yml_file_path,
-      '@message' => $exception->getMessage(),
-    )));
-  }
-
-  // Find tables existing on the database that are not defined in the sanitize
-  // yaml file.
-  if (!array_key_exists('sanitize', $parsed_file)) {
-    return drush_set_error(dt('[Database Sanitize] The file @file does not define an \'sanitize\' key', array(
-      '@file' => $yml_file_path,
-    )));
-  }
-  if (empty($parsed_file['sanitize'])) {
-    return $db_tables;
-  }
-
-  $yml_tables = array();
-  foreach ($parsed_file['sanitize'] as $machine_name => $tables) {
-    foreach($tables as $table_name => $definition) {
-      if (!array_key_exists('description', $definition)) {
-        drush_log(dt('[Database Sanitize] Table \'@table_name\' defined by \'@machine_name\' does not specify a \'description\' key.', array(
-            '@table_name' => $table_name,
-            '@machine_name' => $machine_name
-          )
-        ), 'warning');
-      }
-      if (!array_key_exists('query', $definition)) {
-        drush_log(dt('[Database Sanitize] Table \'@table_name\' defined by \'@machine_name\' does not specify a \'query\' key.', array(
-            '@table_name' => $table_name,
-            '@machine_name' => $machine_name
-          )
-        ), 'warning');
-        continue;
-      }
-      array_push($yml_tables, $table_name);
-    }
-  }
-  $missing = array_diff($db_tables, $yml_tables);
-  if (is_array($missing) && empty($missing)) {
-    drush_log(dt('[Database Sanitize] All database tables are already specified in @file.', array('@file' => $yml_file_path)), 'success');
-    return FALSE;
-  }
-  $skipped = array_diff($yml_tables, $missing);
-  foreach ($skipped as $table_name) {
-    drush_log(dt('[Database Sanitize] Database table \'@table_name\' was already specified.', array('@table_name' => $table_name)), 'notice');
-  }
-  sort($missing);
-  return $missing;
 }
