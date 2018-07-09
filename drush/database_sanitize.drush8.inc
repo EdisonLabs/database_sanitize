@@ -30,15 +30,16 @@ function database_sanitize_drush_help($section) {
  * Implements hook_drush_command().
  */
 function database_sanitize_drush_command() {
+  $sanitize_filename = 'database.sanitize.yml';
   $items['db-sanitize-analyze'] = [
-    'description' => "Compares existing " . DatabaseSanitize::DATABASE_SANITIZE_FILE_NAME . ".yml files on the site installation against existing database tables.",
+    'description' => "Compares existing $sanitize_filename files on the site installation against existing database tables.",
     'callback' => 'database_sanitize_analyze',
     'aliases' => ['dbsa'],
     'options' => [
       'file' => [
         'description' => 'The full path to a sanitize YML file.',
         'required' => FALSE,
-        'example-value' => 'NON-PUBLIC-FOLDER/' . DatabaseSanitize::DATABASE_SANITIZE_FILE_NAME . '.yml',
+        'example-value' => "NON-PUBLIC-FOLDER/$sanitize_filename",
       ],
       'list' => [
         'description' => 'List the table names.',
@@ -49,14 +50,14 @@ function database_sanitize_drush_command() {
   ];
 
   $items['db-sanitize-generate'] = [
-    'description' => "Generates a " . DatabaseSanitize::DATABASE_SANITIZE_FILE_NAME . ".yml file for tables not specified on sanitize YML files.",
+    'description' => "Generates a $sanitize_filename file for tables not specified on sanitize YML files.",
     'callback' => 'database_sanitize_generate',
     'aliases' => ['dbsg'],
     'options' => [
       'file' => [
         'description' => 'The full path to a sanitize YML file.',
         'required' => FALSE,
-        'example-value' => 'NON-PUBLIC-FOLDER/' . DatabaseSanitize::DATABASE_SANITIZE_FILE_NAME . '.yml',
+        'example-value' => "NON-PUBLIC-FOLDER/$sanitize_filename",
       ],
       'machine-name' => [
         'description' => 'The machine name to export the tables under.',
