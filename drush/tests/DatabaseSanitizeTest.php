@@ -84,7 +84,7 @@ class DatabaseSanitizeCase extends CommandUnishTestCase {
     \symlink($target, $this->webRoot . '/modules/database_sanitize');
 
     $this->drush('cache-clear', ['drush'], $this->siteOptions);
-    $this->drush('pm-enable', ['database_sanitize'], $this->siteOptions);
+    $this->drush('pm-enable', ['database_sanitize', 'node'], $this->siteOptions);
 
     // Get tables defined in the database.
     $this->drush('sqlq', ['show tables;'], $this->siteOptions);
@@ -102,7 +102,7 @@ class DatabaseSanitizeCase extends CommandUnishTestCase {
   public function testDatabaseSanitizeCommands() {
     // @see assets/database.sanitize.merge.yml
     $this->assertContains('users', $this->dbTables);
-    $this->drush('sqlq', ['show tables like "user__field_%";'], $this->siteOptions);
+    $this->drush('sqlq', ['show tables like "node_revision%";'], $this->siteOptions);
     $wildcard_tables = $this->getOutputAsList();
 
     // Test db-sanitize-analyze command.
