@@ -232,11 +232,14 @@ class DatabaseSanitize {
         }
 
         // Support for tables with wildcards in the end.
-        if (substr($yml_table, -1) == '*') {
-          $yml_table_pattern = substr($yml_table, 0, -1);
-          if (substr($table_name, 0, strlen($yml_table_pattern)) === $yml_table_pattern) {
-            continue;
+        if (substr($table_name, -1) == '*') {
+          $table_pattern = substr($table_name, 0, -1);
+          foreach ($db_tables as $db_table) {
+            if (substr($db_table, 0, strlen($table_pattern)) === $table_pattern) {
+              array_push($yml_tables, $db_table);
+            }
           }
+          continue;
         }
 
         array_push($yml_tables, $table_name);
