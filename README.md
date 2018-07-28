@@ -53,3 +53,12 @@ The generated queries for each missing table default to `TRUNCATE TABLE $table`.
 
 ## Automated Tests and Code Sniffer
 This repository is integrated with [Travis CI](https://travis-ci.com/EdisonLabs/database_sanitize) to perform tests and detect Drupal coding standards violations.
+
+## Running tests locally for development
+You will need to:
+1. Run composer install.
+2. Run composer install inside the `vendor/drush/drush` directory.
+3. Within the root of the package, run this command adjusting `UNISH_DB_URL` with your database configuration.
+```
+UNISH_DB_URL="mysql://USERNAME:PASSWORD@127.0.0.1" UNISH_NO_TIMEOUTS=y vendor/drush/drush/vendor/bin/phpunit --configuration "vendor/drush/drush/tests" drush/tests/
+```
