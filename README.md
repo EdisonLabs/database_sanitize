@@ -10,7 +10,7 @@ Provides a set of drush commands to assist in generating a `database.sanitize.ym
 - `db-sanitize-generate (dbsg)` generates a `database.sanitize.yml` file for all tables not specified in `database.sanitize.yml` files.
 
 Use the option `--file` to specify a YML file and skip the scan.
-This is meant to be used alongside [merge-yml](https://github.com/EdisonLabs/merge-yaml) composer plugin, so that when you build your local environment for a drupal site, an `database.sanitize.merge.yml` file will be generated. This file's path is what you're expected to pass in.
+This is meant to be used alongside [merge-yaml](https://github.com/EdisonLabs/merge-yaml) composer plugin, so that when you build your local environment for a drupal site, an `database.sanitize.merge.yml` file will be generated. This file's path is what you're expected to pass in.
 
 
 ## Usage instructions
