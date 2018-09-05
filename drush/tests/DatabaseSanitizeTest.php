@@ -84,7 +84,7 @@ class DatabaseSanitizeCase extends CommandUnishTestCase {
     \symlink($target, $this->webRoot . '/modules/database_sanitize');
 
     $this->drush('cache-clear', ['drush'], $this->siteOptions);
-    $this->drush('pm-enable', ['database_sanitize'], $this->siteOptions);
+    $this->drush('pm-enable', ['database_sanitize', 'node'], $this->siteOptions);
 
     // Get tables defined in the database.
     $this->drush('sqlq', ['show tables;'], $this->siteOptions);
@@ -102,13 +102,15 @@ class DatabaseSanitizeCase extends CommandUnishTestCase {
   public function testDatabaseSanitizeCommands() {
     // @see assets/database.sanitize.merge.yml
     $this->assertContains('users', $this->dbTables);
+    $this->drush('sqlq', ['show tables like "node_revision%";'], $this->siteOptions);
+    $wildcard_tables = $this->getOutputAsList();
 
     // Test db-sanitize-analyze command.
     $analyze_options = $this->siteOptions + [
       'file' => $this->mergeYmlFile,
     ];
 
-    $dumped_tables_expected = count($this->dbTables) - 1;
+    $dumped_tables_expected = count($this->dbTables) - (1 + count($wildcard_tables));
     $this->drush('db-sanitize-analyze', [], $analyze_options);
     $eds_analyze_output = $this->getErrorOutput();
     $this->assertContains(sprintf('There are %s tables not defined on sanitize YML files', $dumped_tables_expected), $eds_analyze_output);

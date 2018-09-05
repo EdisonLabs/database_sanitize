@@ -231,6 +231,17 @@ class DatabaseSanitize {
           continue;
         }
 
+        // Support for tables with wildcards in the end.
+        if (substr($table_name, -1) == '*') {
+          $table_pattern = substr($table_name, 0, -1);
+          foreach ($db_tables as $db_table) {
+            if (substr($db_table, 0, strlen($table_pattern)) === $table_pattern) {
+              array_push($yml_tables, $db_table);
+            }
+          }
+          continue;
+        }
+
         array_push($yml_tables, $table_name);
       }
     }
