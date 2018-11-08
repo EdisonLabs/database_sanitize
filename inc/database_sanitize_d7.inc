@@ -33,7 +33,7 @@ function database_sanitize_get_unspecified_tables($yml_file_path = NULL) {
   }
 
   try {
-      $parsed_file = Yaml::parse($file_content);
+      $parsed_file = \Symfony\Component\Yaml\Yaml::parse($file_content);
     }
   catch (ParseException $exception) {
     $message = $exception->getMessage();
@@ -111,12 +111,21 @@ function database_sanitize_get_yml_file_content() {
 
   $file_content = &drupal_static(__FUNCTION__);
 
-  // @TODO provide a way to configure source and target locations.
+  global $conf;
   $default_locations = [
-    DRUPAL_ROOT . '/modules',
+    DRUPAL_ROOT . '/sites/all/modules',
     DRUPAL_ROOT . '/profiles',
   ];
-  $merge_yml = new \EdisonLabs\MergeYaml\MergeYaml(["database.sanitize"], $default_locations, '/tmp');
+  $locations = $default_locations;
+  if (isset($conf['database_sanitize_source']) && !empty($conf['database_sanitize_source']) {
+    $locations = $conf['database_sanitize_source'];
+  }
+  $output_dir = '/tmp';
+  if (isset($conf['database_sanitize_output']) && !empty($conf['database_sanitize_output']) {
+    $output_dir = $conf['database_sanitize_output'];
+  }
+
+  $merge_yml = new \EdisonLabs\MergeYaml\MergeYaml(["database.sanitize"], $locations, $output_dir);
 
   if ($file_content) {
     return $file_content;
