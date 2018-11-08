@@ -83,8 +83,14 @@ function database_sanitize_analyze() {
   if ($yml_file_path && !file_exists($yml_file_path)) {
     return drush_set_error(dt('File does not exist @file', ['@file' => $yml_file_path]));
   }
-
-  $missing_tables = \Drupal::service('database_sanitize')->getUnspecifiedTables($yml_file_path);
+  $major_version = drush_drupal_major_version();
+  if ($major_version == 7) {
+    require __DIR__ . '/../inc/database_sanitize_d7.inc';
+    $missing_tables = database_sanitize_get_unspecified_tables($yml_file_path);
+  }
+  else {
+    $missing_tables = \Drupal::service('database_sanitize')->getUnspecifiedTables($yml_file_path);
+  }
 
   if (!$missing_tables) {
     drush_log(dt('All database tables are already specified in sanitize YML files'), 'ok');
@@ -108,7 +114,15 @@ function database_sanitize_generate() {
   }
 
   $yml_file_path = drush_get_option('file');
-  $missing_tables = \Drupal::service('database_sanitize')->getUnspecifiedTables($yml_file_path);
+  $major_version = drush_drupal_major_version();
+  if ($major_version == 7) {
+    require __DIR__ . '/../inc/database_sanitize_d7.inc';
+    $missing_tables = database_sanitize_get_unspecified_tables($yml_file_path);
+  }
+  else {
+    $missing_tables = \Drupal::service('database_sanitize')->getUnspecifiedTables($yml_file_path);
+  }
+
   if (!$missing_tables) {
     drush_log(dt('All database tables are already specified in sanitize YML files'), 'ok');
     return;
