@@ -5,8 +5,6 @@
  * Install, update and uninstall functions for the database_sanitize module.
  */
 
-use Drupal\Core\Serialization\Yaml;
-use Drupal\database_sanitize\DatabaseSanitize;
 
 /**
  * Implements hook_requirements().
@@ -18,10 +16,10 @@ function database_sanitize_requirements($phase) {
     $requirements['database_sanitize'] = [
       'title' => t('Database Sanitize'),
     ];
-
-    $merge_file_content = \Drupal::service('database_sanitize')->getDatabaseSanitizeYmlFileContent();
+    module_load_include('inc', 'database_sanitize', 'inc/database_sanitize');
+    $merge_file_content = database_sanitize_get_yml_file_content();
     try {
-      $parsed_file = Yaml::decode($merge_file_content);
+      $parsed_file = Symfony\Component\Yaml\Yaml::parse($merge_file_content);
     }
     catch (Exception $exception) {
       $requirements['database_sanitize']['value'] = "Unable to parse the sanitize files as YAML.";
@@ -31,7 +29,7 @@ function database_sanitize_requirements($phase) {
     }
 
     if (!$parsed_file) {
-      $requirements['database_sanitize']['value'] = "There are no " . DatabaseSanitize::DATABASE_SANITIZE_FILE_NAME . ".yml files available.";
+      $requirements['database_sanitize']['value'] = "There are no database_sanitize.yml files available.";
       $requirements['database_sanitize']['severity'] = REQUIREMENT_WARNING;
 
       return $requirements;
@@ -53,7 +51,7 @@ function database_sanitize_requirements($phase) {
       return $requirements;
     }
 
-    $db_tables = \Drupal::database()->query('show tables')->fetchCol();
+    $db_tables = db_query('show tables')->fetchCol();
 
     $yml_tables = [];
     foreach ($parsed_file['sanitize'] as $machine_name => $tables) {

@@ -5,8 +5,6 @@
  * Drush Database Sanitize commands.
  */
 
-use Drupal\database_sanitize\DatabaseSanitize;
-
 /**
  * Implements hook_drush_help().
  */
@@ -19,10 +17,10 @@ function database_sanitize_drush_help($section) {
       return dt('Helper commands for dealing with database sanitization YAML files.');
 
     case 'drush:db-sanitize-analyze':
-      return dt('Compares existing @file.yml files on the site installation against existing database tables.', ['@file' => DatabaseSanitize::DATABASE_SANITIZE_FILE_NAME]);
+      return dt('Compares existing database_sanitize.yml files on the site installation against existing database tables.');
 
     case 'drush:db-sanitize-generate':
-      return dt('Generates a @file.yml file for tables not specified on sanitize YML files.', ['@file' => DatabaseSanitize::DATABASE_SANITIZE_FILE_NAME]);
+      return dt('Generates a database_sanitize.yml file for tables not specified on sanitize YML files.');
   }
 }
 
@@ -83,8 +81,8 @@ function database_sanitize_analyze() {
   if ($yml_file_path && !file_exists($yml_file_path)) {
     return drush_set_error(dt('File does not exist @file', ['@file' => $yml_file_path]));
   }
-
-  $missing_tables = \Drupal::service('database_sanitize')->getUnspecifiedTables($yml_file_path);
+  module_load_include('inc', 'database_sanitize', 'inc/database_sanitize');
+  $missing_tables = database_sanitize_get_unspecified_tables($yml_file_path);
 
   if (!$missing_tables) {
     drush_log(dt('All database tables are already specified in sanitize YML files'), 'ok');
@@ -108,7 +106,10 @@ function database_sanitize_generate() {
   }
 
   $yml_file_path = drush_get_option('file');
-  $missing_tables = \Drupal::service('database_sanitize')->getUnspecifiedTables($yml_file_path);
+
+  module_load_include('inc', 'database_sanitize', 'inc/database_sanitize');
+  $missing_tables = database_sanitize_get_unspecified_tables($yml_file_path);
+
   if (!$missing_tables) {
     drush_log(dt('All database tables are already specified in sanitize YML files'), 'ok');
     return;
