@@ -1,4 +1,4 @@
-[![Build Status](https://travis-ci.com/EdisonLabs/database_sanitize.svg?branch=8.x-1.x)](https://travis-ci.com/EdisonLabs/database_sanitize)
+[![Build Status](https://travis-ci.com/EdisonLabs/database_sanitize.svg?branch=7.x-1.x)](https://travis-ci.com/EdisonLabs/database_sanitize)
 
 # Database Sanitize
 
