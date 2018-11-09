@@ -60,5 +60,5 @@ You will need to:
 2. Run composer install inside the `vendor/drush/drush` directory.
 3. Within the root of the package, run this command adjusting `UNISH_DB_URL` with your database configuration.
 ```
-UNISH_DB_URL="mysql://USERNAME:PASSWORD@127.0.0.1" UNISH_NO_TIMEOUTS=y vendor/drush/drush/vendor/bin/phpunit --configuration "vendor/drush/drush/tests" drush/tests/
+UNISH_DRUPAL_MAJOR_VERSION=7 UNISH_DB_URL="mysql://USERNAME:PASSWORD@127.0.0.1" UNISH_NO_TIMEOUTS=y vendor/drush/drush/vendor/bin/phpunit --configuration "vendor/drush/drush/tests" drush/tests/
 ```
