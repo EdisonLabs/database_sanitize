@@ -17,7 +17,7 @@ if: tag IS blank
 env:
   global:
     # Set the composer vendor Path.
-    - COMPOSER_VENDOR_PATH="$HOME/.composer/vendor"
+    - COMPOSER_VENDOR_PATH="$HOME/.config/.composer/vendor"
 
     # Add executables into PATH.
     - PATH="$PATH:$COMPOSER_VENDOR_PATH/bin"
