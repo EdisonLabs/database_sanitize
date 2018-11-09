@@ -37,4 +37,4 @@ before_script:
 
 script:
   - phpcs --standard=Drupal --ignore=vendor/* --warning-severity=0 .
-  - php "$TRAVIS_BUILD_DIR/vendor/drush/drush/vendor/bin/phpunit" --configuration "$TRAVIS_BUILD_DIR/vendor/drush/drush/tests" "$TRAVIS_BUILD_DIR/drush/tests"
+  - UNISH_DRUPAL_MAJOR_VERSION=7 php "$TRAVIS_BUILD_DIR/vendor/drush/drush/vendor/bin/phpunit" --configuration "$TRAVIS_BUILD_DIR/vendor/drush/drush/tests" "$TRAVIS_BUILD_DIR/drush/tests"
