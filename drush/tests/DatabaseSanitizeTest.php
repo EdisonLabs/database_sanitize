@@ -51,19 +51,6 @@ class DatabaseSanitizeCase extends CommandUnishTestCase {
   protected $mergeYmlFile;
 
   /**
-   * Work around to load EdisonLabs/MergeYaml library on test site.
-   *
-   * This function needs to be called after setUpDrupal().
-   */
-  public function setAutoloader() {
-    $autoloader_real_path = $this->webRoot . '/vendor/composer/autoload_real.php';
-    $autoloader_real_content = file_get_contents($autoloader_real_path);
-    $autoloader_psr4_content = str_replace('<?php', '', file_get_contents(__DIR__ . '/assets/psr4-autoloader.php'));
-    $autoloader_real_content .= $autoloader_psr4_content;
-    file_put_contents($autoloader_real_path, $autoloader_real_content);
-  }
-
-  /**
    * Setup the environment.
    */
   public function setUp() {
@@ -75,8 +62,6 @@ class DatabaseSanitizeCase extends CommandUnishTestCase {
       'uri' => key($sites),
       'yes' => NULL,
     ];
-
-    $this->setAutoloader();
 
     // Symlink database_sanitize inside the site being tested, so that it is
     // available as a drush command.
