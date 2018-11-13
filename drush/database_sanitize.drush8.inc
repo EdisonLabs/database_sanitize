@@ -81,7 +81,7 @@ function database_sanitize_analyze() {
   if ($yml_file_path && !file_exists($yml_file_path)) {
     return drush_set_error(dt('File does not exist @file', ['@file' => $yml_file_path]));
   }
-  module_load_include('inc', 'database_sanitize', 'inc/database_sanitize');
+  require(__DIR__ . '/../inc/database_sanitize.inc');
   $missing_tables = database_sanitize_get_unspecified_tables($yml_file_path);
 
   if (!$missing_tables) {
@@ -107,7 +107,7 @@ function database_sanitize_generate() {
 
   $yml_file_path = drush_get_option('file');
 
-  module_load_include('inc', 'database_sanitize', 'inc/database_sanitize');
+  require(__DIR__ . '/../inc/database_sanitize.inc');
   $missing_tables = database_sanitize_get_unspecified_tables($yml_file_path);
 
   if (!$missing_tables) {
