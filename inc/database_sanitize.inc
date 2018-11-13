@@ -4,6 +4,8 @@
  * @file Provides procedural version of the service for Drupal 7.
  */
 
+require(__DIR__ . '/../vendor/autoload.php');
+
 use EdisonLabs\MergeYaml\MergeYaml;
 use Symfony\Component\Yaml\Yaml;
 
