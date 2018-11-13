@@ -2,4 +2,3 @@ name = Database Sanitize
 description = Provides drush commands for yaml sanitization files checks and generation.
 core = 7.x
 files[] = inc/database_sanitize.inc
-dependencies[] = composer_manager
