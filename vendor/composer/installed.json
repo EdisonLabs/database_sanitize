@@ -6,12 +6,12 @@
         "source": {
             "type": "git",
             "url": "https://github.com/EdisonLabs/merge-yaml.git",
-            "reference": "9521f234b215bfa2b123b8e784e8b818560ab0a5"
+            "reference": "9b6d80874e464cad82609e10c634143ab6a80cd0"
         },
         "dist": {
             "type": "zip",
-            "url": "https://api.github.com/repos/EdisonLabs/merge-yaml/zipball/9521f234b215bfa2b123b8e784e8b818560ab0a5",
-            "reference": "9521f234b215bfa2b123b8e784e8b818560ab0a5",
+            "url": "https://api.github.com/repos/EdisonLabs/merge-yaml/zipball/9b6d80874e464cad82609e10c634143ab6a80cd0",
+            "reference": "9b6d80874e464cad82609e10c634143ab6a80cd0",
             "shasum": ""
         },
         "require": {
@@ -24,7 +24,7 @@
             "php-coveralls/php-coveralls": "^2.0",
             "phpunit/phpunit": "^6.5"
         },
-        "time": "2018-10-24T11:48:16+00:00",
+        "time": "2018-11-16T14:18:06+00:00",
         "type": "composer-plugin",
         "extra": {
             "class": "EdisonLabs\\MergeYaml\\Plugin"

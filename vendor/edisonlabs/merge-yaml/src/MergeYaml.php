@@ -137,6 +137,7 @@ class MergeYaml
 
         $finder = new Finder();
         $finder->files();
+        $finder->followLinks();
         $finder->in($this->sourcePaths);
         $finder->sortByName();
 
