@@ -220,12 +220,12 @@
             "source": {
                 "type": "git",
                 "url": "https://github.com/consolidation/annotated-command.git",
-                "reference": "e8d3de6f2dc5641af99d594b76bfb9700f053593"
+                "reference": "8e7d1a05230dc1159c751809e98b74f2b7f71873"
             },
             "dist": {
                 "type": "zip",
-                "url": "https://api.github.com/repos/consolidation/annotated-command/zipball/e8d3de6f2dc5641af99d594b76bfb9700f053593",
-                "reference": "e8d3de6f2dc5641af99d594b76bfb9700f053593",
+                "url": "https://api.github.com/repos/consolidation/annotated-command/zipball/8e7d1a05230dc1159c751809e98b74f2b7f71873",
+                "reference": "8e7d1a05230dc1159c751809e98b74f2b7f71873",
                 "shasum": ""
             },
             "require": {
@@ -264,7 +264,7 @@
                 }
             ],
             "description": "Initialize Symfony Console commands from annotated command class methods.",
-            "time": "2018-10-21T06:28:30+00:00"
+            "time": "2018-11-15T01:46:18+00:00"
         },
         {
             "name": "consolidation/output-formatters",
@@ -705,12 +705,12 @@
             "source": {
                 "type": "git",
                 "url": "https://github.com/bobthecow/psysh.git",
-                "reference": "a52ac07419e3e22afe0aad677b0e5e038ba19be3"
+                "reference": "9eb500f8be3f420312eacfa4da74c1cbadcbf59f"
             },
             "dist": {
                 "type": "zip",
-                "url": "https://api.github.com/repos/bobthecow/psysh/zipball/a52ac07419e3e22afe0aad677b0e5e038ba19be3",
-                "reference": "a52ac07419e3e22afe0aad677b0e5e038ba19be3",
+                "url": "https://api.github.com/repos/bobthecow/psysh/zipball/9eb500f8be3f420312eacfa4da74c1cbadcbf59f",
+                "reference": "9eb500f8be3f420312eacfa4da74c1cbadcbf59f",
                 "shasum": ""
             },
             "require": {
@@ -771,7 +771,7 @@
                 "interactive",
                 "shell"
             ],
-            "time": "2018-10-31T13:55:08+00:00"
+            "time": "2018-11-16T07:24:53+00:00"
         },
         {
             "name": "symfony/console",
@@ -779,12 +779,12 @@
             "source": {
                 "type": "git",
                 "url": "https://github.com/symfony/console.git",
-                "reference": "2db8714c7706a1076c7d9a9b8b4ad1ca611a8035"
+                "reference": "8a9fbfb330de32cecffbd4ff5733e0a512741e3e"
             },
             "dist": {
                 "type": "zip",
-                "url": "https://api.github.com/repos/symfony/console/zipball/2db8714c7706a1076c7d9a9b8b4ad1ca611a8035",
-                "reference": "2db8714c7706a1076c7d9a9b8b4ad1ca611a8035",
+                "url": "https://api.github.com/repos/symfony/console/zipball/8a9fbfb330de32cecffbd4ff5733e0a512741e3e",
+                "reference": "8a9fbfb330de32cecffbd4ff5733e0a512741e3e",
                 "shasum": ""
             },
             "require": {
@@ -840,7 +840,7 @@
             ],
             "description": "Symfony Console Component",
             "homepage": "https://symfony.com",
-            "time": "2018-11-11T19:48:54+00:00"
+            "time": "2018-11-15T12:14:04+00:00"
         },
         {
             "name": "symfony/debug",
@@ -848,12 +848,12 @@
             "source": {
                 "type": "git",
                 "url": "https://github.com/symfony/debug.git",
-                "reference": "0aae90af4e1e7fc5b14928ca424056f9e7046cf4"
+                "reference": "7a8a60421b828aa8e1ee10bd14c9256cc50c2a46"
             },
             "dist": {
                 "type": "zip",
-                "url": "https://api.github.com/repos/symfony/debug/zipball/0aae90af4e1e7fc5b14928ca424056f9e7046cf4",
-                "reference": "0aae90af4e1e7fc5b14928ca424056f9e7046cf4",
+                "url": "https://api.github.com/repos/symfony/debug/zipball/7a8a60421b828aa8e1ee10bd14c9256cc50c2a46",
+                "reference": "7a8a60421b828aa8e1ee10bd14c9256cc50c2a46",
                 "shasum": ""
             },
             "require": {
@@ -896,7 +896,7 @@
             ],
             "description": "Symfony Debug Component",
             "homepage": "https://symfony.com",
-            "time": "2018-11-11T19:52:12+00:00"
+            "time": "2018-11-13T19:31:34+00:00"
         },
         {
             "name": "symfony/event-dispatcher",

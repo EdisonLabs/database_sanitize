@@ -144,4 +144,3 @@ function database_sanitize_get_yml_file_content() {
 
   return $file_content;
 }
-
