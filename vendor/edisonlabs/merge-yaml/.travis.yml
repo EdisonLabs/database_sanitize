@@ -1,0 +1,39 @@
+# @file
+# .travis.yml - EdisonLabs merge-yaml Travis CI Integration
+
+language: php
+
+php:
+  - 7.1
+
+matrix:
+  fast_finish: true
+
+# Skip tests for tags.
+if: tag IS blank
+
+env:
+  global:
+    # Set the composer vendor Path.
+    - COMPOSER_VENDOR_PATH="$HOME/.config/composer/vendor"
+
+    # Add executables into PATH.
+    - PATH="$PATH:$COMPOSER_VENDOR_PATH/bin"
+
+before_install:
+  - composer self-update
+
+install:
+  - composer global require "squizlabs/php_codesniffer=*"
+  - composer global require escapestudios/symfony2-coding-standard:~3
+  - phpcs --config-set installed_paths "$COMPOSER_VENDOR_PATH/escapestudios/symfony2-coding-standard"
+
+before_script:
+  - composer install -vvv
+
+script:
+  - phpcs --ignore=vendor/* --standard=Symfony --warning-severity=0 .
+  - phpunit --configuration phpunit.xml
+
+after_success:
+  - travis_retry php vendor/bin/php-coveralls
