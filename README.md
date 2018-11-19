@@ -5,6 +5,25 @@
 ## Overview
 Provides a set of drush commands to assist in generating a `database.sanitize.yml` file containing all the queries for database sanitization.
 
+### Configuration
+The commands by default will scan for `database.sanitize.yml` files on the following directories:
+```
+/sites/all/modules
+/profiles
+/default
+```
+You can configure different directories by setting an array of directories relative to `DRUPAL_ROOT` on the configuration variable `database_sanitize_source`:
+```
+variable_set('database_sanitize_source', array('/MYCUSTOM_DIRECTORY'));
+```
+Or alternatively on your `settings.php` file:
+```
+$conf['database_sanitize_source'] = array(
+  'sites/all/modules',
+  'profiles',
+);
+```
+
 ### Commands included
 - `db-sanitize-analyze (dbsa)` Compares existing `database.sanitize.yml` files on the site installation against existing database tables and list tables that needs to be verified and possibly sanitized.
 - `db-sanitize-generate (dbsg)` generates a `database.sanitize.yml` file for all tables not specified in `database.sanitize.yml` files.
