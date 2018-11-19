@@ -117,6 +117,7 @@ function database_sanitize_get_yml_file_content() {
   $default_locations = [
     DRUPAL_ROOT . '/sites/all/modules',
     DRUPAL_ROOT . '/profiles',
+    DRUPAL_ROOT . '/sites/default',
   ];
   $locations = $default_locations;
   if (isset($conf['database_sanitize_source']) && !empty($conf['database_sanitize_source'])) {
