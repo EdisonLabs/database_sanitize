@@ -123,12 +123,7 @@ function database_sanitize_get_yml_file_content() {
   if (isset($conf['database_sanitize_source']) && !empty($conf['database_sanitize_source'])) {
     $locations = $conf['database_sanitize_source'];
   }
-  $output_dir = '/tmp';
-  if (isset($conf['database_sanitize_output']) && !empty($conf['database_sanitize_output'])) {
-    $output_dir = $conf['database_sanitize_output'];
-  }
-
-  $merge_yml = new MergeYaml(["database.sanitize"], $locations, $output_dir);
+  $merge_yml = new MergeYaml(["database.sanitize"], $locations, '/tmp');
 
   if ($file_content) {
     return $file_content;
