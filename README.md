@@ -10,7 +10,7 @@ The commands by default will scan for `database.sanitize.yml` files on the follo
 ```
 /sites/all/modules
 /profiles
-/default
+/sites/default
 ```
 You can configure different directories by setting an array of directories relative to `DRUPAL_ROOT` on the configuration variable `database_sanitize_source`:
 ```
