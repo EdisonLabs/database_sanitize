@@ -5,6 +5,20 @@
 ## Overview
 Provides a set of drush commands to assist in generating a `database.sanitize.yml` file containing all the queries for database sanitization.
 
+### Commands included
+- `db-sanitize-analyze (dbsa)` Compares existing `database.sanitize.yml` files on the site installation against existing database tables and list tables that needs to be verified and possibly sanitized.
+- `db-sanitize-generate (dbsg)` generates a `database.sanitize.yml` file for all tables not specified in `database.sanitize.yml` files.
+
+Use the option `--file` to specify a YML file and skip the scan.
+This is meant to be used alongside [merge-yaml](https://github.com/EdisonLabs/merge-yaml) composer plugin, so that when you build your local environment for a drupal site, an `database.sanitize.merge.yml` file will be generated. This file's path is what you're expected to pass in.
+
+## Installation instructions
+To install, there are two options:
+- If you want it available for all sites, place the `database_sanitize` folder on your `~/.drush` folder.
+- If you only want it on one site, place the `database_sanitize` folder on the `sites/all/modules/contrib` folder of that site.
+
+After that, run `drush cc drush` so the command is registered with drush.
+
 ### Configuration
 The commands by default will scan for `database.sanitize.yml` files on the following directories:
 ```
@@ -23,14 +37,6 @@ $conf['database_sanitize_source'] = array(
   'profiles',
 );
 ```
-
-### Commands included
-- `db-sanitize-analyze (dbsa)` Compares existing `database.sanitize.yml` files on the site installation against existing database tables and list tables that needs to be verified and possibly sanitized.
-- `db-sanitize-generate (dbsg)` generates a `database.sanitize.yml` file for all tables not specified in `database.sanitize.yml` files.
-
-Use the option `--file` to specify a YML file and skip the scan.
-This is meant to be used alongside [merge-yaml](https://github.com/EdisonLabs/merge-yaml) composer plugin, so that when you build your local environment for a drupal site, an `database.sanitize.merge.yml` file will be generated. This file's path is what you're expected to pass in.
-
 
 ## Usage instructions
 You can provide a `database.sanitize.yml` file containing queries for database sanitization for your module or profile.
