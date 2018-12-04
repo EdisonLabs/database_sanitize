@@ -79,7 +79,9 @@ class DatabaseSanitizeCommands extends DrushCommands {
    * @command db:sanitize-generate
    * @aliases dbsg,db-sanitize-generate
    *
-   * @return array|void
+   * @return array
+   *   Array of sanitization entries - TODO: more info.
+   *
    * @throws \Exception
    */
   public function sanitizeGenerate(array $options = ['file' => NULL, 'machine-name' => NULL]) {
@@ -92,7 +94,7 @@ class DatabaseSanitizeCommands extends DrushCommands {
     $missing_tables = \Drupal::service('database_sanitize')->getUnspecifiedTables($yml_file_path);
     if (!$missing_tables) {
       $this->logger()->info(dt('All database tables are already specified in sanitize YML files'), 'ok');
-      return;
+      return [];
     }
 
     $content = [
