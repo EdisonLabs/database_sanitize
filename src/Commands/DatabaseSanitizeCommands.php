@@ -18,6 +18,8 @@ use Drush\Commands\DrushCommands;
 class DatabaseSanitizeCommands extends DrushCommands {
 
   /**
+   * Analyze existing yml files.
+   *
    * Compares existing database.sanitize.yml files on the site installation
    * against existing database tables.
    *
@@ -32,12 +34,10 @@ class DatabaseSanitizeCommands extends DrushCommands {
    *
    * @command db:sanitize-analyze
    * @aliases dbsa,db-sanitize-analyze
-   * @return void
+   *
    * @throws \Exception
    */
   public function sanitizeAnalyze(array $options = ['file' => NULL, 'list' => NULL]) {
-    // See bottom of https://weitzman.github.io/blog/port-to-drush9 for details on what to change when porting a
-    // legacy command.
     if (empty($options['file'])) {
       $options['file'] = $this->io()->ask('Please provide the full path to a sanitize YML file');
     }
@@ -62,10 +62,14 @@ class DatabaseSanitizeCommands extends DrushCommands {
   }
 
   /**
-   * Generates a database.sanitize.yml file for tables not specified on sanitize YML files.
+   * Generates a database.sanitize.yml file.
+   *
+   * Generate database.sanitize.yml file for tables not specified on sanitize
+   * YML files.
    *
    * @param array $options
-   *   An associative array of options whose values come from cli, aliases, config, etc.
+   *   An associative array of options whose values come from cli, aliases,
+   *   config, etc.
    *
    * @option file
    *   The full path to a sanitize YML file.
@@ -74,6 +78,9 @@ class DatabaseSanitizeCommands extends DrushCommands {
    *
    * @command db:sanitize-generate
    * @aliases dbsg,db-sanitize-generate
+   *
+   * @return array|void
+   * @throws \Exception
    */
   public function sanitizeGenerate(array $options = ['file' => NULL, 'machine-name' => NULL]) {
     $machine_name = $options['machine-name'];
@@ -100,6 +107,7 @@ class DatabaseSanitizeCommands extends DrushCommands {
       ];
     }
 
-    return $content;  }
+    return $content;
+  }
 
 }
