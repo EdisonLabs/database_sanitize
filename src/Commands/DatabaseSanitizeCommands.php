@@ -50,7 +50,7 @@ class DatabaseSanitizeCommands extends DrushCommands {
     $missing_tables = \Drupal::service('database_sanitize')->getUnspecifiedTables($file);
 
     if (!$missing_tables) {
-      $this->logger()->info(dt('All database tables are already specified in sanitize YML files'), 'ok');
+      $this->logger()->info(dt('All database tables are already specified in sanitize YML files'));
       return;
     }
 
@@ -87,13 +87,17 @@ class DatabaseSanitizeCommands extends DrushCommands {
   public function sanitizeGenerate(array $options = ['file' => NULL, 'machine-name' => NULL]) {
     $machine_name = $options['machine-name'];
     if (empty($machine_name)) {
-      throw new \Exception(dt('You must specify a machine-name'));
+      $machine_name = $this->io()->ask('Please provide the machine name to export the tables under');
+    }
+
+    if (empty($options['file'])) {
+      $options['file'] = $this->io()->ask('Please provide the full path to a sanitize YML file');
     }
 
     $yml_file_path = $options['file'];
     $missing_tables = \Drupal::service('database_sanitize')->getUnspecifiedTables($yml_file_path);
     if (!$missing_tables) {
-      $this->logger()->info(dt('All database tables are already specified in sanitize YML files'), 'ok');
+      $this->logger()->info(dt('All database tables are already specified in sanitize YML files'));
       return [];
     }
 
