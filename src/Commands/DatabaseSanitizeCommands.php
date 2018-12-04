@@ -38,12 +38,8 @@ class DatabaseSanitizeCommands extends DrushCommands {
    * @throws \Exception
    */
   public function sanitizeAnalyze(array $options = ['file' => NULL, 'list' => NULL]) {
-    if (empty($options['file'])) {
-      $options['file'] = $this->io()->ask('Please provide the full path to a sanitize YML file');
-    }
-
     $file = $options['file'];
-    if (!file_exists($file)) {
+    if (!empty($file) && !file_exists($file)) {
       throw new \Exception(dt('File @file does not exist', ['@file' => $file]));
     }
 
