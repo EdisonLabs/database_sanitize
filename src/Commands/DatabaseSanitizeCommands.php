@@ -18,10 +18,12 @@ use Drush\Commands\DrushCommands;
 class DatabaseSanitizeCommands extends DrushCommands {
 
   /**
-   * Compares existing database.sanitize.yml files on the site installation against existing database tables.
+   * Compares existing database.sanitize.yml files on the site installation
+   * against existing database tables.
    *
    * @param array $options
-   *   An associative array of options whose values come from cli, aliases, config, etc.
+   *   An associative array of options whose values come from cli, aliases,
+   *   config, etc.
    *
    * @option file
    *   The full path to a sanitize YML file.
@@ -30,10 +32,33 @@ class DatabaseSanitizeCommands extends DrushCommands {
    *
    * @command db:sanitize-analyze
    * @aliases dbsa,db-sanitize-analyze
+   * @return void
+   * @throws \Exception
    */
   public function sanitizeAnalyze(array $options = ['file' => NULL, 'list' => NULL]) {
     // See bottom of https://weitzman.github.io/blog/port-to-drush9 for details on what to change when porting a
     // legacy command.
+    if (empty($options['file'])) {
+      $options['file'] = $this->io()->ask('Please provide the full path to a sanitize YML file');
+    }
+
+    $file = $options['file'];
+    if (!file_exists($file)) {
+      throw new \Exception(dt('File @file does not exist', ['@file' => $file]));
+    }
+
+    $missing_tables = \Drupal::service('database_sanitize')->getUnspecifiedTables($file);
+
+    if (!$missing_tables) {
+      $this->logger()->info(dt('All database tables are already specified in sanitize YML files'), 'ok');
+      return;
+    }
+
+    $this->logger()->warning(dt('There are @count tables not defined on sanitize YML files', ['@count' => count($missing_tables)]));
+
+    if (!empty($options['list'])) {
+      $this->logger()->warning(implode("\n", $missing_tables));
+    }
   }
 
   /**
