@@ -35,8 +35,8 @@ before_script:
   - mv composer.json.dev composer.json
   - mv composer.lock.dev composer.lock
   - composer install -vvv
-  - cd "$TRAVIS_BUILD_DIR/vendor/drush/drush"; composer install
+  - composer install -d "$TRAVIS_BUILD_DIR/vendor/drush/drush"
 
 script:
-  - phpcs --standard=Drupal --ignore=vendor/* --warning-severity=0 .
+  - phpcs --standard=Drupal --ignore=vendor --warning-severity=0 "$TRAVIS_BUILD_DIR"
   - UNISH_DRUPAL_MAJOR_VERSION=7 php "$TRAVIS_BUILD_DIR/vendor/drush/drush/vendor/bin/phpunit" --configuration "$TRAVIS_BUILD_DIR/vendor/drush/drush/tests" "$TRAVIS_BUILD_DIR/drush/tests"
