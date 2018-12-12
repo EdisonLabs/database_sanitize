@@ -79,7 +79,8 @@ The generated queries for each missing table default to `TRUNCATE TABLE $table`.
 ## Automated Tests and Code Sniffer
 This repository is integrated with [Travis CI](https://travis-ci.com/EdisonLabs/database_sanitize) to perform tests and detect Drupal coding standards violations.
 
-## Running tests locally for development
+## Development
+### Running tests locally
 You will need to:
 1. Run composer install.
 2. Run composer install inside the `vendor/drush/drush` directory.
@@ -87,3 +88,12 @@ You will need to:
 ```
 UNISH_DRUPAL_MAJOR_VERSION=7 UNISH_DB_URL="mysql://USERNAME:PASSWORD@127.0.0.1" UNISH_NO_TIMEOUTS=y vendor/drush/drush/vendor/bin/phpunit --configuration "vendor/drush/drush/tests" drush/tests/
 ```
+
+### Composer manager support
+Currently this module is distributed with the Composer `/vendor` folder containing the required packages.
+This is necessary because the Composer plugin [merge-yaml](https://github.com/EdisonLabs/merge-yaml) required by the module is incompatible with the version of Composer provided by [Drupal composer](https://www.drupal.org/project/composer) module.
+See: https://github.com/EdisonLabs/database_sanitize/issues/10.
+
+#### Updating the packages
+To update the packages, remove the suffix `.dev` from the `composer.json.dev` and `composer.lock.dev` files and run `composer update --no-dev` in the module's folder. After the update add the suffix `.dev` back to the files and commit all the changes.
+
