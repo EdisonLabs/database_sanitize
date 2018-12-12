@@ -5,6 +5,8 @@
  * Install, update and uninstall functions for the database_sanitize module.
  */
 
+use Symfony\Component\Yaml\Yaml;
+
 /**
  * Implements hook_requirements().
  */
@@ -18,7 +20,7 @@ function database_sanitize_requirements($phase) {
     module_load_include('inc', 'database_sanitize', 'inc/database_sanitize');
     $merge_file_content = database_sanitize_get_yml_file_content();
     try {
-      $parsed_file = Symfony\Component\Yaml\Yaml::parse($merge_file_content);
+      $parsed_file = Yaml::parse($merge_file_content);
     }
     catch (Exception $exception) {
       $requirements['database_sanitize']['value'] = "Unable to parse the sanitize files as YAML.";

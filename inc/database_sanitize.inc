@@ -1,10 +1,11 @@
 <?php
 
 /**
- * @file Provides procedural version of the service for Drupal 7.
+ * @file
+ * Provides procedural version of the service for Drupal 7.
  */
 
-require(__DIR__ . '/../vendor/autoload.php');
+require __DIR__ . '/../vendor/autoload.php';
 
 use EdisonLabs\MergeYaml\MergeYaml;
 use Symfony\Component\Yaml\Yaml;
@@ -12,7 +13,7 @@ use Symfony\Component\Yaml\Yaml;
 /**
  * Procedural version of DatabaseSanitize::getUnspecifiedTables().
  *
- * @param  string  $yml_file_path
+ * @param string $yml_file_path
  *   Optional parameter, the YML file path.
  *
  * @return array
@@ -38,8 +39,8 @@ function database_sanitize_get_unspecified_tables($yml_file_path = NULL) {
   }
 
   try {
-      $parsed_file = Yaml::parse($file_content);
-    }
+    $parsed_file = Yaml::parse($file_content);
+  }
   catch (ParseException $exception) {
     $message = $exception->getMessage();
     drupal_set_message(t("Unable to parse the sanitize YAML file. @message", ['@message' => $message]), 'error');
@@ -103,9 +104,6 @@ function database_sanitize_get_unspecified_tables($yml_file_path = NULL) {
 
 /**
  * Procedural version of DatabaseSanitize::getDatabaseSanitizeYmlFileContent().
- *
- * @param string $yml_file_path
- *   Optional parameter, the YML file path.
  *
  * @return array
  *   The list of tables not specified in sanitize YAML files.
