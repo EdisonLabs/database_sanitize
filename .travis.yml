@@ -31,10 +31,6 @@ install:
   - composer global require drupal/coder --prefer-dist -vvv || exit 1
   - phpcs --config-set installed_paths "$COMPOSER_VENDOR_PATH/drupal/coder/coder_sniffer"
 
-before_script:
-  - composer install -vvv
-  - cd "$TRAVIS_BUILD_DIR/vendor/drush/drush"; composer install
-
 script:
   - phpcs --standard=Drupal --ignore=vendor/* --warning-severity=0 .
   - UNISH_DRUPAL_MAJOR_VERSION=7 php "$TRAVIS_BUILD_DIR/vendor/drush/drush/vendor/bin/phpunit" --configuration "$TRAVIS_BUILD_DIR/vendor/drush/drush/tests" "$TRAVIS_BUILD_DIR/drush/tests"
