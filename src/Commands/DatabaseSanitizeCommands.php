@@ -67,7 +67,7 @@ class DatabaseSanitizeCommands extends DrushCommands {
   }
 
   /**
-   * Generate Sanitization entries.
+   * Generates Sanitization entries for tables not specified on sanitize YML files..
    *
    * @param array $options
    *   An associative array of options whose values come from cli, aliases,
