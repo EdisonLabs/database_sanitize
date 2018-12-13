@@ -2,20 +2,29 @@
 
 namespace Drupal\database_sanitize\Commands;
 
+use Drupal\database_sanitize\DatabaseSanitize;
 use Drush\Commands\DrushCommands;
 
 /**
- * A Drush commandfile.
- *
- * In addition to this file, you need a drush.services.yml
- * in root of your module, and a composer.json file that provides the name
- * of the services file to use.
- *
- * See these files for an example of injecting Drupal services:
- *   - http://cgit.drupalcode.org/devel/tree/src/Commands/DevelCommands.php
- *   - http://cgit.drupalcode.org/devel/tree/drush.services.yml
+ * Class DatabaseSanitizeCommands
  */
 class DatabaseSanitizeCommands extends DrushCommands {
+
+  /**
+   * The sanitizer service instance.
+   *
+   * @var \Drupal\database_sanitize\DatabaseSanitize
+   */
+  protected $sanitizer;
+
+  /**
+   * DatabaseSanitizeCommands constructor.
+   *
+   * @param \Drupal\database_sanitize\DatabaseSanitize $sanitizer
+   */
+  public function __construct(DatabaseSanitize $sanitizer) {
+    $this->sanitizer = $sanitizer;
+  }
 
   /**
    * Analyze existing yml files.
@@ -37,13 +46,13 @@ class DatabaseSanitizeCommands extends DrushCommands {
    *
    * @throws \Exception
    */
-  public function sanitizeAnalyze(array $options = ['file' => NULL, 'list' => NULL]) {
+  public function analyze(array $options = ['file' => NULL, 'list' => NULL]) {
     $file = $options['file'];
     if (!empty($file) && !file_exists($file)) {
       throw new \Exception(dt('File @file does not exist', ['@file' => $file]));
     }
 
-    $missing_tables = \Drupal::service('database_sanitize')->getUnspecifiedTables($file);
+    $missing_tables = $this->sanitizer->getUnspecifiedTables($file);
 
     if (!$missing_tables) {
       $this->logger()->info(dt('All database tables are already specified in sanitize YML files'));
@@ -58,10 +67,7 @@ class DatabaseSanitizeCommands extends DrushCommands {
   }
 
   /**
-   * Generates a database.sanitize.yml file.
-   *
-   * Generate database.sanitize.yml file for tables not specified on sanitize
-   * YML files.
+   * Generate Sanitization entries.
    *
    * @param array $options
    *   An associative array of options whose values come from cli, aliases,
@@ -80,7 +86,7 @@ class DatabaseSanitizeCommands extends DrushCommands {
    *
    * @throws \Exception
    */
-  public function sanitizeGenerate(array $options = ['file' => NULL, 'machine-name' => NULL]) {
+  public function generate(array $options = ['file' => NULL, 'machine-name' => NULL]) {
     $machine_name = $options['machine-name'];
     if (empty($machine_name)) {
       $machine_name = $this->io()->ask('Please provide the machine name to export the tables under');
@@ -91,7 +97,7 @@ class DatabaseSanitizeCommands extends DrushCommands {
     }
 
     $yml_file_path = $options['file'];
-    $missing_tables = \Drupal::service('database_sanitize')->getUnspecifiedTables($yml_file_path);
+    $missing_tables = $this->sanitizer->getUnspecifiedTables($yml_file_path);
     if (!$missing_tables) {
       $this->logger()->info(dt('All database tables are already specified in sanitize YML files'));
       return [];

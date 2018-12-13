@@ -1,5 +1,6 @@
 services:
   database_sanitize.commands:
     class: \Drupal\database_sanitize\Commands\DatabaseSanitizeCommands
+    arguments: ['@database_sanitize']
     tags:
       - { name: drush.command }
