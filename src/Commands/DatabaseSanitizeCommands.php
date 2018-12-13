@@ -6,7 +6,7 @@ use Drupal\database_sanitize\DatabaseSanitize;
 use Drush\Commands\DrushCommands;
 
 /**
- * Class DatabaseSanitizeCommands
+ * Drush commands for Database Sanitize.
  */
 class DatabaseSanitizeCommands extends DrushCommands {
 
