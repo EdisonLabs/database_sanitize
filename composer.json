@@ -9,5 +9,12 @@
     },
     "require-dev": {
         "drush/drush": "~8.1.17"
+    },
+    "extra": {
+        "drush": {
+            "services": {
+                "drush.services.yml": "^9"
+            }
+        }
     }
 }
