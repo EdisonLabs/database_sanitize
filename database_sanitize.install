@@ -52,7 +52,16 @@ function database_sanitize_requirements($phase) {
       return $requirements;
     }
 
-    $db_tables = db_query('show tables')->fetchCol();
+    // Catch MySQL error on SHOW TABLES query.
+    try {
+      $db_tables = db_query('SHOW TABLES')->fetchCol();
+    }
+    catch (PDOException $e) {
+      $requirements['database_sanitize']['value'] = "Error while trying to run 'SHOW TABLES' query: " . $e->getMessage();
+      $requirements['database_sanitize']['severity'] = REQUIREMENT_ERROR;
+
+      return $requirements;
+    }
 
     $yml_tables = [];
     foreach ($parsed_file['sanitize'] as $machine_name => $tables) {
