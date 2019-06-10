@@ -3,6 +3,7 @@
 namespace Drupal\database_sanitize;
 
 use Drupal\Component\Serialization\Json;
+use Drupal\Core\Database\Connection;
 use Drupal\Core\Logger\LoggerChannelFactoryInterface;
 use EdisonLabs\MergeYaml\MergeYaml;
 use Symfony\Component\DependencyInjection\ContainerInterface;
@@ -34,15 +35,25 @@ class DatabaseSanitize {
   protected $logger;
 
   /**
+   * Database Service Object.
+   *
+   * @var \Drupal\Core\Database\Connection
+   */
+  protected $database;
+
+  /**
    * DatabaseSanitize constructor.
    *
    * @param \Drupal\Core\Logger\LoggerChannelFactoryInterface $logger
    *   The LoggerChannelFactoryInterface object.
+   * @param \Drupal\Core\Database\Connection $database
+   *   The database connection to be used.
    *
    * @throws \Exception
    */
-  public function __construct(LoggerChannelFactoryInterface $logger) {
+  public function __construct(LoggerChannelFactoryInterface $logger, Connection $database) {
     $this->logger = $logger->get('database_sanitize');
+    $this->database = $database;
 
     $locations = $this->getSourceLocations();
     $output_dir = $this->getOutputDir();
@@ -55,7 +66,8 @@ class DatabaseSanitize {
    */
   public static function create(ContainerInterface $container) {
     return new static(
-      $container->get('logger.factory')
+      $container->get('logger.factory'),
+      $container->get('database')
     );
   }
 
@@ -188,7 +200,7 @@ class DatabaseSanitize {
     }
 
     // Get a list of all tables on the database.
-    $db_tables = \Drupal::database()->query('show tables')->fetchCol();
+    $db_tables = $this->database->schema()->findTables('%');
 
     if (empty($file_content)) {
       return $db_tables;
