@@ -53,7 +53,7 @@ function database_sanitize_requirements($phase) {
       return $requirements;
     }
 
-    $db_tables = \Drupal::database()->query('show tables')->fetchCol();
+    $db_tables = \Drupal::service('database')->schema()->findTables('%');
 
     $yml_tables = [];
     foreach ($parsed_file['sanitize'] as $machine_name => $tables) {
