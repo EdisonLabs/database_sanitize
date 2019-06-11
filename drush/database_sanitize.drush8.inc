@@ -46,6 +46,11 @@ function database_sanitize_drush_command() {
         'required' => FALSE,
       ],
     ],
+    'outputformat' => [
+      'default' => 'yaml',
+      'output-data-type' => 'format-yaml',
+      'pipe-format' => 'json',
+    ],
     'bootstrap' => DRUSH_BOOTSTRAP_DRUPAL_FULL,
   ];
 
@@ -86,17 +91,20 @@ function database_sanitize_analyze() {
   }
 
   $missing_tables = \Drupal::service('database_sanitize')->getUnspecifiedTables($yml_file_path);
-
   if (!$missing_tables) {
     drush_log(dt('All database tables are already specified in sanitize YML files'), 'ok');
-    return;
+    return [
+      'result' => TRUE,
+    ];
   }
 
   drush_log(dt('There are @count tables not defined on sanitize YML files', ['@count' => count($missing_tables)]), 'warning');
-
   if (drush_get_option('list')) {
-    drush_log(implode("\n", $missing_tables), 'warning');
+    return $missing_tables;
   }
+  return [
+    'result' => FALSE,
+  ];
 }
 
 /**
