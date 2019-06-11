@@ -66,6 +66,7 @@ function database_sanitize_drush_command() {
     'outputformat' => [
       'default' => 'yaml',
       'output-data-type' => 'format-yaml',
+      'pipe-format' => 'json',
     ],
     'bootstrap' => DRUSH_BOOTSTRAP_DRUPAL_FULL,
   ];
