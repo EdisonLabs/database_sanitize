@@ -86,25 +86,34 @@ function database_sanitize_drush_command() {
  */
 function database_sanitize_analyze() {
   $yml_file_path = drush_get_option('file');
+  $machine_readable = drush_get_option('format') || drush_get_context('DRUSH_PIPE');
   if ($yml_file_path && !file_exists($yml_file_path)) {
     return drush_set_error(dt('File does not exist @file', ['@file' => $yml_file_path]));
   }
 
+  $result = FALSE;
   $missing_tables = \Drupal::service('database_sanitize')->getUnspecifiedTables($yml_file_path);
+
   if (!$missing_tables) {
-    drush_log(dt('All database tables are already specified in sanitize YML files'), 'ok');
-    return [
-      'result' => TRUE,
-    ];
+    $result = TRUE;
+    if (!$machine_readable) {
+      drush_log(dt('All database tables are already specified in sanitize YML files'), 'ok');
+    }
   }
 
-  drush_log(dt('There are @count tables not defined on sanitize YML files', ['@count' => count($missing_tables)]), 'warning');
+  elseif (!$machine_readable) {
+    drush_log(dt('There are @count tables not defined on sanitize YML files', ['@count' => count($missing_tables)]), 'warning');
+  }
+
   if (drush_get_option('list')) {
     return $missing_tables;
   }
-  return [
-    'result' => FALSE,
-  ];
+
+  if ($machine_readable) {
+    return [
+      'result' => $result,
+    ];
+  }
 }
 
 /**
