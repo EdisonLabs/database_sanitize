@@ -66,14 +66,14 @@ function database_sanitize_requirements($phase) {
     $yml_tables = [];
     foreach ($parsed_file['sanitize'] as $machine_name => $tables) {
       foreach ($tables as $table_name => $definition) {
-        if (is_array($definition) && !array_key_exists('query', $definition)) {
+        if (is_array($definition) && !empty(array_filter($definition)) && !array_key_exists('query', $definition)) {
           $requirements['database_sanitize']['value'] = "The table '{$table_name}' defined by '{$machine_name}' does not specify a 'query' key.";
           $requirements['database_sanitize']['severity'] = REQUIREMENT_ERROR;
 
           return $requirements;
         }
 
-        if (is_array($definition) && !array_key_exists('description', $definition)) {
+        if (is_array($definition) && !empty(array_filter($definition)) && !array_key_exists('description', $definition)) {
           $requirements['database_sanitize']['value'] = "The table '{$table_name}' defined by '{$machine_name}' does not specify a 'description' key.";
           $requirements['database_sanitize']['severity'] = REQUIREMENT_ERROR;
 
