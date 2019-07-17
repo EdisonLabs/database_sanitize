@@ -4,3 +4,6 @@ sanitize:
             description: 'This is a test'
             query: 'TRUNCATE users'
         node_revision*: false
+        users_data:
+            - false
+            - false

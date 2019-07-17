@@ -110,7 +110,7 @@ class DatabaseSanitizeCase extends CommandUnishTestCase {
       'file' => $this->mergeYmlFile,
     ];
 
-    $dumped_tables_expected = count($this->dbTables) - (1 + count($wildcard_tables));
+    $dumped_tables_expected = count($this->dbTables) - (2 + count($wildcard_tables));
     $this->drush('db-sanitize-analyze', [], $analyze_options);
     $eds_analyze_output = $this->getErrorOutput();
     $this->assertContains(sprintf('There are %s tables not defined on sanitize YML files', $dumped_tables_expected), $eds_analyze_output);

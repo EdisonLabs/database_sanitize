@@ -217,12 +217,12 @@ class DatabaseSanitize {
     $yml_tables = [];
     foreach ($parsed_file['sanitize'] as $machine_name => $tables) {
       foreach ($tables as $table_name => $definition) {
-        if (is_array($definition) && !array_key_exists('description', $definition)) {
+        if (is_array($definition) && !empty(array_filter($definition)) && !array_key_exists('description', $definition)) {
           $this->logger->warning('Table \'@table_name\' defined by \'@machine_name\' does not specify a \'description\' key', ['@table_name' => $table_name, '@machine_name' => $machine_name]);
           continue;
         }
 
-        if (is_array($definition) && !array_key_exists('query', $definition)) {
+        if (is_array($definition) && !empty(array_filter($definition)) && !array_key_exists('query', $definition)) {
           $this->logger->warning('Table \'@table_name\' defined by \'@machine_name\' does not specify a \'query\' key', ['@table_name' => $table_name, '@machine_name' => $machine_name]);
           continue;
         }
