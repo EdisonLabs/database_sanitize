@@ -30,7 +30,11 @@ sanitize:
         DBTABLENAME3:
             description: 'query description'
             query: 'DB QUERY 3'
+        DBTABLENAME4: false
+        DBTABLENAMEPREFIX*: false
 ```
+
+Using a wildcard `*` for table names is supported. For example, setting `node_revision*` will apply to all tables names starting with `node_revision`.
 
 ### Commands usage
 To find out how many tables needs to be defined in `database.sanitize.yml` files:
