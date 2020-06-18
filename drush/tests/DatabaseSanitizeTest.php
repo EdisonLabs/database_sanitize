@@ -68,7 +68,7 @@ class DatabaseSanitizeCase extends CommandUnishTestCase {
    */
   public function setUp() {
     // Install the standard install profile.
-    $sites = $this->setUpDrupal(1, TRUE, UNISH_DRUPAL_MAJOR_VERSION);
+    $sites = $this->setUpDrupal(1, TRUE);
     $this->webRoot = $this->webroot();
     $this->siteOptions = [
       'root' => $this->webRoot,
