@@ -33,8 +33,9 @@ install:
 
 before_script:
   - composer install -vvv
-  - cd "$TRAVIS_BUILD_DIR/vendor/drush/drush"; composer install
+  - cd "$TRAVIS_BUILD_DIR/vendor/"; git clone --branch 10.2.2 https://github.com/drush-ops/drush.git drush-tests
+  - cd "$TRAVIS_BUILD_DIR/vendor/drush-tests"; composer install
 
 script:
   - phpcs --standard=Drupal --ignore=vendor/* --warning-severity=0 .
-  - php "$TRAVIS_BUILD_DIR/vendor/drush/drush/vendor/bin/phpunit" --configuration "$TRAVIS_BUILD_DIR/vendor/drush/drush/tests" "$TRAVIS_BUILD_DIR/drush/tests"
+  - php "$TRAVIS_BUILD_DIR/vendor/drush-tests/vendor/bin/phpunit" --configuration "$TRAVIS_BUILD_DIR/vendor/drush-tests/tests" "$TRAVIS_BUILD_DIR/drush/tests"
