@@ -5,7 +5,7 @@
     "type": "drupal-module",
     "minimum-stability": "dev",
     "require": {
-        "edisonlabs/merge-yaml": "2.0.0-alpha1"
+        "edisonlabs/merge-yaml": "~2"
     },
     "require-dev": {
         "drush/drush": "~10.2.2"
@@ -13,7 +13,7 @@
     "extra": {
         "drush": {
             "services": {
-                "drush.services.yml": "^10"
+                "drush.services.yml": "^9 || ^10"
             }
         }
     }
