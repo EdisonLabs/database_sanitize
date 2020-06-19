@@ -56,7 +56,7 @@ class DatabaseSanitizeCase extends CommandUnishTestCase {
    * This function needs to be called after setUpDrupal().
    */
   public function setAutoloader() {
-    $autoloader_real_path = $this->webRoot . '/vendor/composer/autoload_real.php';
+    $autoloader_real_path = $this->webRoot . '/../vendor/composer/autoload_real.php';
     $autoloader_real_content = file_get_contents($autoloader_real_path);
     $autoloader_psr4_content = str_replace('<?php', '', file_get_contents(__DIR__ . '/assets/psr4-autoloader.php'));
     $autoloader_real_content .= $autoloader_psr4_content;
