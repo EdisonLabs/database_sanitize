@@ -41,4 +41,4 @@ before_script:
   
 script:
   - phpcs --standard=Drupal --ignore=vendor/* --warning-severity=0 .
-  - php "$TRAVIS_BUILD_DIR/vendor/drush-tests/vendor/bin/phpunit" --configuration "$TRAVIS_BUILD_DIR/vendor/drush-tests/tests" "$TRAVIS_BUILD_DIR/drush/tests"
+  - php "$TRAVIS_BUILD_DIR/vendor/drush/vendor/bin/phpunit" --configuration "$TRAVIS_BUILD_DIR/vendor/drush/tests" "$TRAVIS_BUILD_DIR/drush/tests"
