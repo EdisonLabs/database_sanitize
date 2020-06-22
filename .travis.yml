@@ -4,12 +4,13 @@
 language: php
 
 php:
-  - 7.1
+  - 7.3
 
 matrix:
   fast_finish: true
 
-dist: trusty
+services:
+  - mysql
 
 # Skip tests for tags.
 if: tag IS blank
@@ -30,12 +31,14 @@ before_install:
 install:
   - composer global require drupal/coder --prefer-dist -vvv || exit 1
   - phpcs --config-set installed_paths "$COMPOSER_VENDOR_PATH/drupal/coder/coder_sniffer"
+  - phpenv config-add travis.php.ini
+  - php -ini | grep memory_limit
 
 before_script:
   - composer install -vvv
-  - cd "$TRAVIS_BUILD_DIR/vendor/"; git clone --branch 10.2.2 https://github.com/drush-ops/drush.git drush-tests
-  - cd "$TRAVIS_BUILD_DIR/vendor/drush-tests"; composer install
-
+  - cd "$TRAVIS_BUILD_DIR/vendor/"; rm -rf drush; git clone --branch 10.2.2 https://github.com/drush-ops/drush.git drush
+  - cd "$TRAVIS_BUILD_DIR/vendor/drush"; composer install
+  
 script:
   - phpcs --standard=Drupal --ignore=vendor/* --warning-severity=0 .
-  - php "$TRAVIS_BUILD_DIR/vendor/drush-tests/vendor/bin/phpunit" --configuration "$TRAVIS_BUILD_DIR/vendor/drush-tests/tests" "$TRAVIS_BUILD_DIR/drush/tests"
+  - php "$TRAVIS_BUILD_DIR/vendor/drush/vendor/bin/phpunit" --configuration "$TRAVIS_BUILD_DIR/vendor/drush/tests" "$TRAVIS_BUILD_DIR/drush/tests"
