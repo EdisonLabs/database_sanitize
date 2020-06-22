@@ -38,7 +38,8 @@ before_script:
   - composer install -vvv
   - cd "$TRAVIS_BUILD_DIR/vendor/"; git clone --branch 10.2.2 https://github.com/drush-ops/drush.git drush-tests
   - cd "$TRAVIS_BUILD_DIR/vendor/drush-tests"; composer install
-  - composer require edisonlabs/merge-yaml:~1  --prefer-dist -vvv
+  - cd "$TRAVIS_BUILD_DIR/vendor/drush-tests/vendor"; git clone --branch 2.0.0-alpha1 https://github.com/EdisonLabs/merge-yaml.git
+  - cd "$TRAVIS_BUILD_DIR/vendor/drush-tests/vendor/merge-yaml"; composer install
   
 script:
   - phpcs --standard=Drupal --ignore=vendor/* --warning-severity=0 .
