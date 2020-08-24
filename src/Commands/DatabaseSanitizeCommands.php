@@ -55,14 +55,14 @@ class DatabaseSanitizeCommands extends DrushCommands {
     $missing_tables = $this->sanitizer->getUnspecifiedTables($file);
 
     if (!$missing_tables) {
-      $this->logger()->info(dt('All database tables are already specified in sanitize YML files'));
+      \Drupal::logger('database_sanitize')->log('success', (dt('All database tables are already specified in sanitize YML files')));
       return;
     }
 
-    $this->logger()->warning(dt('There are @count tables not defined on sanitize YML files', ['@count' => count($missing_tables)]));
+    \Drupal::logger('database_sanitize')->log('warning', (dt('There are @count tables not defined on sanitize YML files', ['@count' => count($missing_tables)])));
 
     if (!empty($options['list'])) {
-      $this->logger()->warning(implode("\n", $missing_tables));
+      \Drupal::logger('database_sanitize')->log('warning', (implode("\n", $missing_tables)));
     }
   }
 
@@ -81,8 +81,7 @@ class DatabaseSanitizeCommands extends DrushCommands {
    * @command db:sanitize-generate
    * @aliases dbsg,db-sanitize-generate
    *
-   * @return array
-   *   Array of sanitization entries - TODO: more info.
+   * @return Consolidation\OutputFormatters\Formatters\YamlFormatter
    *
    * @throws \Exception
    */
@@ -99,7 +98,7 @@ class DatabaseSanitizeCommands extends DrushCommands {
     $yml_file_path = $options['file'];
     $missing_tables = $this->sanitizer->getUnspecifiedTables($yml_file_path);
     if (!$missing_tables) {
-      $this->logger()->info(dt('All database tables are already specified in sanitize YML files'));
+      \Drupal::logger('database_sanitize')->log('success', (dt('All database tables are already specified in sanitize YML files')));
       return [];
     }
 
