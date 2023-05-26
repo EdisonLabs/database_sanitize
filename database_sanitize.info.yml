@@ -1,4 +1,4 @@
 name: 'Database Sanitize'
 type: module
 description: 'Provides drush commands for yaml sanitization files checks and generation.'
-core_version_requirement: ^8 || ^9
+core_version_requirement: ^8 || ^9 || ^10
