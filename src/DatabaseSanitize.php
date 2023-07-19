@@ -200,13 +200,13 @@ class DatabaseSanitize {
     }
     catch (ParseException $exception) {
       $message = $exception->getMessage();
-      \Drupal::logger('database_sanitize')->log('error', (dt("Unable to parse the sanitize YAML file. @message", ['@message' => $message])));
+      $this->logger->error(dt("Unable to parse the sanitize YAML file. @message", ['@message' => $message]));
 
       return $db_tables;
     }
 
     if (is_null($parsed_file) || !array_key_exists('sanitize', $parsed_file)) {
-      \Drupal::logger('database_sanitize')->log('error', (dt("The 'sanitize' key is not defined")));
+      $this->logger->error(dt("The 'sanitize' key is not defined"));
 
       return $db_tables;
     }
@@ -219,12 +219,12 @@ class DatabaseSanitize {
     foreach ($parsed_file['sanitize'] as $machine_name => $tables) {
       foreach ($tables as $table_name => $definition) {
         if (is_array($definition) && !array_key_exists('description', $definition)) {
-          \Drupal::logger('database_sanitize')->log('warning', (dt('Table \'@table_name\' defined by \'@machine_name\' does not specify a \'description\' key', ['@table_name' => $table_name, '@machine_name' => $machine_name])));
+          $this->logger->warning(dt('Table \'@table_name\' defined by \'@machine_name\' does not specify a \'description\' key', ['@table_name' => $table_name, '@machine_name' => $machine_name]));
           continue;
         }
 
         if (is_array($definition) && !array_key_exists('query', $definition)) {
-          \Drupal::logger('database_sanitize')->log('warning', (dt('Table \'@table_name\' defined by \'@machine_name\' does not specify a \'query\' key', ['@table_name' => $table_name, '@machine_name' => $machine_name])));
+          $this->logger->warning(dt('Table \'@table_name\' defined by \'@machine_name\' does not specify a \'query\' key', ['@table_name' => $table_name, '@machine_name' => $machine_name]));
           continue;
         }
 
@@ -249,11 +249,11 @@ class DatabaseSanitize {
 
     $missing = array_diff($db_tables, $yml_tables);
     if (is_array($missing) && empty($missing)) {
-      \Drupal::logger('database_sanitize')->log('success', (dt('All database tables are already specified in sanitize YML files')));
+      $this->logger->info(dt('All database tables are already specified in sanitize YML files'));
 
       return [];
     } else {
-      \Drupal::logger('database_sanitize')->log('warning', (dt('There are @count tables not defined on sanitize YML files', ['@count' => count($missing)])));
+      $this->logger->warning(dt('There are @count tables not defined on sanitize YML files', ['@count' => count($missing)]));
       }
 
     sort($missing);
