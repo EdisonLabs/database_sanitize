@@ -249,7 +249,7 @@ class DatabaseSanitize {
 
     $missing = array_diff($db_tables, $yml_tables);
     if (is_array($missing) && empty($missing)) {
-      $this->logger->info(dt('All database tables are already specified in sanitize YML files'));
+      $this->logger->notice(dt('All database tables are already specified in sanitize YML files'));
 
       return [];
     } else {
