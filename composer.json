@@ -8,7 +8,7 @@
         "edisonlabs/merge-yaml": "dev-d11-4x"
     },
     "require-dev": {
-        "drush/drush": "~10.2.2"
+        "drush/drush": "~13"
     },
     "extra": {
         "drush": {
